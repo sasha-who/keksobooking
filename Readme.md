@@ -1,7 +1,7 @@
 # Личный проект «Кексобукинг» [![Build status][travis-image]][travis-url]
 
 * Студент: [Саша Смыгина](https://up.htmlacademy.ru/javascript/18/user/277207).
-* Наставник: `Неизвестно`.
+* Наставник: [Игорь Антонов](https://up.htmlacademy.ru/javascript/18/user/3162).
 
 ---
 
