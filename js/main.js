@@ -10,12 +10,12 @@ var advertisementNearbyTemplate = document.querySelector('#pin').content.querySe
 
 var getMapPinWidth = function () {
   var mapPinWidth = getComputedStyle(document.querySelector('.map__pin')).width;
-  return parseInt(mapPinWidth.slice(0, mapPinWidth.length - 2));
+  return parseInt(mapPinWidth.slice(0, mapPinWidth.length - 2), 10);
 };
 
 var getMapPinHeight = function () {
   var mapPinHeight = getComputedStyle(document.querySelector('.map__pin')).height;
-  return parseInt(mapPinHeight.slice(0, mapPinHeight.length - 2));
+  return parseInt(mapPinHeight.slice(0, mapPinHeight.length - 2), 10);
 };
 
 var getRandomNumber = function (min, max) {
@@ -29,10 +29,8 @@ var getRandomArrayElement = function (arrayElements) {
 };
 
 var getUniqueArrayElement = function (arrayElements) {
-  if (arrayElements) {
-    var uniqueElement = arrayElements.splice(getRandomNumber(0, arrayElements.length - 1), 1);
-    return uniqueElement[0];
-  }
+  var uniqueElement = arrayElements.splice(getRandomNumber(0, arrayElements.length - 1), 1);
+  return uniqueElement[0];
 };
 
 var getArrayWithRandomLength = function (arrayElements) {
@@ -62,7 +60,7 @@ var generateAdvertisementsList = function () {
   var getAdvertisementTemplate = function () {
     var getLocationX = function () {
       var mapWigth = getComputedStyle(map).width;
-      return getRandomNumber(0, parseInt(mapWigth.slice(0, mapWigth.length - 2)));
+      return getRandomNumber(0, parseInt(mapWigth.slice(0, mapWigth.length - 2), 10));
     };
     var locationX = getLocationX();
     var locationY = getRandomNumber(130, 630);
@@ -100,8 +98,7 @@ var generateAdvertisementsList = function () {
   }
 
   return advertisementsList;
-}
-
+};
 advertisementsList = generateAdvertisementsList();
 
 var renderAdvertisement = function (advertisement) {
