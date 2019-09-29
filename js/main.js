@@ -1,20 +1,96 @@
 'use strict';
-var ADVERTISEMENTS_AMOUNT = 8;
+
+var ADVERTISEMENTS_COUNT = 8;
+var TITLE_TEMPLATE = 'заголовок предложения';
+var DESCRIPTION_TEMPLATE = 'описание';
+
+var ADVERTISEMENT_TYPE_LIST = [
+  'palace',
+  'flat',
+  'house',
+  'bungalo'
+];
+
+var ADVERTISEMENT_CHECKIN_LIST = [
+  '12:00',
+  '13:00',
+  '14:00'
+];
+
+var ADVERTISEMENT_CHECKOUT_LIST = [
+  '12:00',
+  '13:00',
+  '14:00'
+];
+
+var ADVERTISEMENT_FEATURES_LIST = [
+  'wifi',
+  'dishwasher',
+  'parking',
+  'washer',
+  'elevator',
+  'conditioner'
+];
+
+var ADVERTISEMENT_PHOTOS_LIST = [
+  'http://o0.github.io/assets/images/tokyo/hotel1.jpg',
+  'http://o0.github.io/assets/images/tokyo/hotel2.jpg',
+  'http://o0.github.io/assets/images/tokyo/hotel3.jpg'
+];
+
+var priceOptions = {
+  MIN: 1000,
+  MAX: 50000
+};
+
+var locationYOptions = {
+  MIN: 130,
+  MAX: 630
+};
+
+var avatarOptions = {
+  PATH: 'img/avatars/user0',
+  EXTENSION: '.png',
+  IDENTIFIER_COUNT: 8,
+  identifiers: function () {
+    var identifiersArray = [];
+
+    for (var i = 1; i <= this.IDENTIFIER_COUNT; i++) {
+      identifiersArray.push(i);
+    }
+
+    return identifiersArray;
+  }
+};
+
+var roomsOptions = {
+  MIN: 1,
+  MAX: 5
+};
+
+var guestsOptions = {
+  MIN: 1,
+  MAX: 10
+};
+
 var advertisementsList = [];
 
-var map = document.querySelector('.map');
-map.classList.remove('map--faded');
+var mapContainer = document.querySelector('.map');
+mapContainer.classList.remove('map--faded');
 
-var advertisementsNearbyList = document.querySelector('.map__pins');
-var advertisementNearbyTemplate = document.querySelector('#pin').content.querySelector('.map__pin');
+var offers = mapContainer.querySelector('.map__pins');
+var offerTemplate = document.querySelector('#pin')
+    .content
+    .querySelector('.map__pin');
+var mapPin = document.querySelector('.map__pin');
 
 var getMapPinWidth = function () {
-  var mapPinWidth = getComputedStyle(document.querySelector('.map__pin')).width;
+  var mapPinWidth = getComputedStyle(mapPin).width;
   return parseInt(mapPinWidth.slice(0, mapPinWidth.length - 2), 10);
 };
 
 var getMapPinHeight = function () {
-  var mapPinHeight = getComputedStyle(document.querySelector('.map__pin')).height;
+  var mapPinHeight = getComputedStyle(mapPin).height;
   return parseInt(mapPinHeight.slice(0, mapPinHeight.length - 2), 10);
 };
 
@@ -28,60 +104,56 @@ var getRandomArrayElement = function (arrayElements) {
   return arrayElements[getRandomNumber(0, arrayElements.length - 1)];
 };
 
-var getUniqueArrayElement = function (arrayElements) {
-  var uniqueElement = arrayElements.splice(getRandomNumber(0, arrayElements.length - 1), 1);
-  return uniqueElement[0];
+var getReorderingArray = function (arrayElements) {
+  for (var i = arrayElements.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var temp = arrayElements[i];
+    arrayElements[i] = arrayElements[j];
+    arrayElements[j] = temp;
+  }
+
+  return arrayElements;
 };
 
 var getArrayWithRandomLength = function (arrayElements) {
-  var resultArray = [];
-  var arrayElementsCopy = arrayElements.slice();
+  var reorderedArray = getReorderingArray(arrayElements);
+  var arrayWithRandomLength = [];
 
-  for (var i = 0; i < getRandomNumber(0, arrayElementsCopy.length - 1); i++) {
-    var newElement = getUniqueArrayElement(arrayElementsCopy);
-    resultArray.push(newElement);
+  for (var i = 0; i < getRandomNumber(0, arrayElements.length); i++) {
+    arrayWithRandomLength.push(reorderedArray[i]);
   }
 
-  if (!resultArray.length) {
-    return [];
-  }
-
-  return resultArray;
+  return arrayWithRandomLength;
 };
 
 var generateAdvertisementsList = function () {
-  var advertisementAvatarIdentificators = [1, 2, 3, 4, 5, 6, 7, 8];
-  var advertisementTypeList = ['palace', 'flat', 'house', 'bungalo'];
-  var advertisementCheckinList = ['12:00', '13:00', '14:00'];
-  var advertisementCheckoutList = ['12:00', '13:00', '14:00'];
-  var advertisementFeaturesList = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
-  var advertisementPhotosList = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.github.io/assets/images/tokyo/hotel2.jpg', 'http://o0.github.io/assets/images/tokyo/hotel3.jpg'];
+  var getLocationX = function () {
+    var mapWigth = getComputedStyle(mapContainer).width;
+    return getRandomNumber(0, parseInt(mapWigth.slice(0, mapWigth.length - 2), 10));
+  };
+  var reorderedAvatarsId = getReorderingArray(avatarOptions.identifiers());
 
-  var getAdvertisementTemplate = function () {
-    var getLocationX = function () {
-      var mapWigth = getComputedStyle(map).width;
-      return getRandomNumber(0, parseInt(mapWigth.slice(0, mapWigth.length - 2), 10));
-    };
+  for (var i = 0; i < ADVERTISEMENTS_COUNT; i++) {
     var locationX = getLocationX();
-    var locationY = getRandomNumber(130, 630);
+    var locationY = getRandomNumber(locationYOptions.MIN, locationYOptions.MAX);
 
     var advertisementTemplate = {
       author: {
-        avatar: 'img/avatars/user0' + getUniqueArrayElement(advertisementAvatarIdentificators) + '.png'
+        avatar: avatarOptions.PATH + reorderedAvatarsId[i] + avatarOptions.EXTENSION
       },
 
       offer: {
-        title: 'заголовок предложения',
+        title: TITLE_TEMPLATE,
         address: locationX + ', ' + locationY,
-        price: getRandomNumber(1000, 50000),
-        type: getRandomArrayElement(advertisementTypeList),
-        rooms: getRandomNumber(1, 5),
-        guests: getRandomNumber(1, 10),
-        checkin: getRandomArrayElement(advertisementCheckinList),
-        checkout: getRandomArrayElement(advertisementCheckoutList),
-        features: getArrayWithRandomLength(advertisementFeaturesList),
-        description: 'описание',
-        photos: getArrayWithRandomLength(advertisementPhotosList)
+        price: getRandomNumber(priceOptions.MIN, priceOptions.MAX),
+        type: getRandomArrayElement(ADVERTISEMENT_TYPE_LIST),
+        rooms: getRandomNumber(roomsOptions.MIN, roomsOptions.MAX),
+        guests: getRandomNumber(guestsOptions.MIN, guestsOptions.MAX),
+        checkin: getRandomArrayElement(ADVERTISEMENT_CHECKIN_LIST),
+        checkout: getRandomArrayElement(ADVERTISEMENT_CHECKOUT_LIST),
+        features: getArrayWithRandomLength(ADVERTISEMENT_FEATURES_LIST),
+        description: DESCRIPTION_TEMPLATE,
+        photos: getArrayWithRandomLength(ADVERTISEMENT_PHOTOS_LIST)
       },
 
       location: {
@@ -90,11 +162,7 @@ var generateAdvertisementsList = function () {
       }
     };
 
-    return advertisementTemplate;
-  };
-
-  for (var i = 0; i < ADVERTISEMENTS_AMOUNT; i++) {
-    advertisementsList[i] = getAdvertisementTemplate();
+    advertisementsList.push(advertisementTemplate);
   }
 
   return advertisementsList;
@@ -102,11 +170,12 @@ var generateAdvertisementsList = function () {
 advertisementsList = generateAdvertisementsList();
 
 var renderAdvertisement = function (advertisement) {
-  var advertisementElement = advertisementNearbyTemplate.cloneNode(true);
+  var advertisementElement = offerTemplate.cloneNode(true);
 
-  advertisementElement.setAttribute('style', 'left: ' + (advertisement.location.x - getMapPinWidth() / 2) + 'px; top: ' + (advertisement.location.y - getMapPinHeight()) + 'px;');
-  advertisementElement.querySelector('img').setAttribute('src', advertisement.author.avatar);
-  advertisementElement.querySelector('img').setAttribute('alt', advertisement.offer.title);
+  advertisementElement.style.left = (advertisement.location.x - getMapPinWidth() / 2) + 'px';
+  advertisementElement.style.top = (advertisement.location.y - getMapPinHeight()) + 'px';
+  advertisementElement.querySelector('img').src = advertisement.author.avatar;
+  advertisementElement.querySelector('img').alt = advertisement.offer.title;
 
   return advertisementElement;
 };
@@ -118,7 +187,7 @@ var renderaAdvertisementsNearbyList = function () {
     fragment.appendChild(renderAdvertisement(advertisementsList[i]));
   }
 
-  advertisementsNearbyList.appendChild(fragment);
+  offers.appendChild(fragment);
 };
 
 renderaAdvertisementsNearbyList();
