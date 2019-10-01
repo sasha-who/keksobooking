@@ -102,6 +102,11 @@ var getMapPinHeight = function () {
   return parseInt(mapPinHeight.slice(0, mapPinHeight.length - 2), 10);
 };
 
+var getLocationX = function () {
+  var mapWigth = getComputedStyle(mapContainer).width;
+  return getRandomNumber(0, parseInt(mapWigth.slice(0, mapWigth.length - 2), 10));
+};
+
 var getRandomNumber = function (min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
@@ -135,10 +140,6 @@ var getArrayWithRandomLength = function (arrayElements) {
 };
 
 var generateAdvertisementsList = function () {
-  var getLocationX = function () {
-    var mapWigth = getComputedStyle(mapContainer).width;
-    return getRandomNumber(0, parseInt(mapWigth.slice(0, mapWigth.length - 2), 10));
-  };
   var reorderedAvatarsId = getReorderingArray(avatarOptions.identifiers());
 
   for (var i = 0; i < ADVERTISEMENTS_COUNT; i++) {
