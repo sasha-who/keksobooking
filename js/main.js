@@ -185,12 +185,6 @@ var renderAdvertisement = function (advertisement) {
   advertisementElement.querySelector('img').src = advertisement.author.avatar;
   advertisementElement.querySelector('img').alt = advertisement.offer.title;
 
-  if (advertisement.offer.photos.length > 1) {
-    for (var i = 0; i < advertisement.offer.photos.length - 2; i++) {
-
-    }
-  }
-
   return advertisementElement;
 };
 
@@ -207,34 +201,26 @@ var renderaAdvertisementsNearbyList = function () {
 renderaAdvertisementsNearbyList();
 
 var renderCard = function (advertisement) {
+  var photosArray = advertisement.offer.photos;
   var cardPopup = cardPopupTemplate.cloneNode(true);
+  var cardPopupPhotoTemplate = cardPopup.querySelector('popup__photo');
+  var fragment = document.createDocumentFragment();
 
-  var createExtraImg = function () {
-
-  };
-
-  var getCardPhotos = function () {
-    var photosArray = advertisement.offer.photos;
-    var cardPopupPhotoTemplate = cardPopup.querySelector('popup__photo');
-    var fragment = document.createDocumentFragment();
-
-    if (photosArray.length) {
-      for (var i = 1; i < photosArray.length; i++) {
-        var cardPopupPhoto = cardPopupPhotoTemplate;
-        cardPopupPhoto.setAttribute('src', photosArray[i]);
-        fragment.appendChild(cardPopupPhoto);
-      }
+  if (photosArray.length > 1) {
+    for (var i = 0; i < photosArray.length - 1; i++) {
+      var cardPopupExtraPhoto = cardPopupPhotoTemplate.cloneNode();
+      fragment.appendChild(cardPopupExtraPhoto);
     }
+  }
 
-    cardPopup.querySelector('.popup__photos').appendChild(fragment);
-
-    return;
-  };
+  cardPopup.appendChild(fragment);
 
   var roomsCount = advertisement.offer.rooms + ' комнаты для ';
   var guestsCount = advertisement.offer.guests + ' гостей';
   var checkinDescription = 'Заезд после ' + advertisement.offer.checkin;
   var checkoutDescription = ', выезд до ' + advertisement.offer.checkout;
+
+  var photosElements = cardPopup.querySelectorAll('.popup__photo');
 
   cardPopup.querySelector('.popup__title').textContent = advertisement.offer.title;
   cardPopup.querySelector('.popup__text--address').textContent = advertisement.offer.address;
@@ -247,8 +233,13 @@ var renderCard = function (advertisement) {
   cardPopup.querySelector('.popup__features')
       .textContent = advertisement.offer.features.join(', ');
   cardPopup.querySelector('.popup__description').textContent = advertisement.offer.description;
-  cardPopup.querySelector('.popup__photos').textContent = getCardPhotos();
   cardPopup.querySelector('.popup__avatar').src = advertisement.author.avatar;
+
+  if (photosElements.length) {
+    for (var j = 0; j < photosElements.length; j++) {
+      photosElements[j].src = advertisement.offer.photos[j];
+    }
+  }
 
   return cardPopup;
 };
