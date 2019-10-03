@@ -3,6 +3,7 @@
 var ADVERTISEMENTS_COUNT = 8;
 var TITLE_TEMPLATE = 'заголовок предложения';
 var DESCRIPTION_TEMPLATE = 'описание';
+var ENTER_KEYCODE = 13;
 
 var ADVERTISEMENT_TYPE_LIST = [
   'palace',
@@ -83,8 +84,6 @@ var ApartmentType = {
 var advertisementsList = [];
 
 var mapContainer = document.querySelector('.map');
-mapContainer.classList.remove('map--faded');
-
 var offers = mapContainer.querySelector('.map__pins');
 var offerTemplate = document.querySelector('#pin')
     .content
@@ -200,8 +199,6 @@ var renderaAdvertisementsNearbyList = function () {
   offers.appendChild(fragment);
 };
 
-renderaAdvertisementsNearbyList();
-
 var renderCard = function (advertisement) {
   var roomsCount = advertisement.offer.rooms + ' комнаты для ';
   var guestsCount = advertisement.offer.guests + ' гостей';
@@ -245,5 +242,50 @@ var renderCard = function (advertisement) {
   return cardPopup;
 };
 
-mapContainer.insertBefore(renderCard(advertisementsList[0]), mapContainer
+var adForm = document.querySelector('.ad-form');
+var adFormHeader = adForm.querySelector('.ad-form-header');
+var adFormElements = adForm.querySelectorAll('.ad-form__element');
+var mapPinMain = offers.querySelector('.map__pin--main');
+var mapFilters = mapContainer.querySelector('.map__filters');
+var mapFeatures = mapFilters.querySelectorAll('.map__features');
+var mapFilterList = mapFilters.querySelectorAll('.map__filter');
+
+var activateElements = function (elements) {
+  for (var i = 0; i < elements.length; i++) {
+    elements[i].disabled = true;
+  }
+};
+
+var deactivateElements = function (elements) {
+  for (var i = 0; i < elements.length; i++) {
+    elements[i].disabled = false;
+  }
+};
+
+var activateMap = function () {
+  mapContainer.classList.remove('map--faded');
+  adForm.classList.remove('ad-form--disabled');
+  adFormHeader.disabled = false;
+  deactivateElements(adFormElements);
+  mapFeatures.disabled = false;
+  deactivateElements(mapFilterList);
+
+  renderaAdvertisementsNearbyList();
+  mapContainer.insertBefore(renderCard(advertisementsList[0]), mapContainer
     .querySelector('.map__filters-container'));
+};
+
+adFormHeader.disabled = true;
+activateElements(adFormElements);
+mapFeatures.disabled = true;
+activateElements(mapFilterList);
+
+mapPinMain.addEventListener('mousedown', function () {
+  activateMap();
+});
+
+mapPinMain.addEventListener('keydown', function (evt) {
+  if (evt.keyCode === ENTER_KEYCODE) {
+    activateMap();
+  }
+});
