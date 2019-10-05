@@ -99,7 +99,7 @@ var adFormElements = adForm.querySelectorAll('.ad-form__element');
 var mapFilters = mapContainer.querySelector('.map__filters');
 var mapFeatures = mapFilters.querySelectorAll('.map__features');
 var mapFilterList = mapFilters.querySelectorAll('.map__filter');
-var formAddress = document.querySelector('#address');
+var formAddress = adForm.querySelector('#address');
 
 var mainPin = {
   width: parseFloat(getComputedStyle(mapPinMain).width),
@@ -290,13 +290,14 @@ var addMainPinLocation = function () {
   formAddress.value = mainPin.locationX() + ', ' + mainPin.locationYActive();
 };
 
-// В неактивном состоянии
+// Форма в неактивном состоянии
 adFormHeader.disabled = true;
 deactivateElements(adFormElements);
 mapFeatures.disabled = true;
 deactivateElements(mapFilterList);
 formAddress.value = mainPin.locationX() + ', ' + mainPin.locationY();
 
+// Активация формы
 mapPinMain.addEventListener('mousedown', function () {
   activateMap();
   addMainPinLocation();
@@ -308,3 +309,8 @@ mapPinMain.addEventListener('keydown', function (evt) {
     addMainPinLocation();
   }
 });
+
+// Валидация формы на соответствие количеству человек в номерах
+var roomNumber = adForm.querySelector('#room_number');
+var capacity = adForm.querySelector('#capacity');
+
