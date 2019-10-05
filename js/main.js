@@ -311,6 +311,17 @@ mapPinMain.addEventListener('keydown', function (evt) {
 });
 
 // Валидация формы на соответствие количеству человек в номерах
-var roomNumber = adForm.querySelector('#room_number');
 var capacity = adForm.querySelector('#capacity');
+var room = adForm.querySelector('#room_number');
 
+capacity.addEventListener('input', function (evt) {
+  var target = evt.target;
+  var roomNumber = parseInt(room.value, 10);
+  var capacityNumber = parseInt(target.value, 10);
+
+  if ((roomNumber === 100 && capacityNumber !== 0) || (roomNumber < capacityNumber)) {
+    target.setCustomValidity('Недопустимое соотношение комнат и гостей');
+  } else {
+    target.setCustomValidity('');
+  }
+});
