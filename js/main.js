@@ -203,13 +203,12 @@ var renderaAdvertisementsNearbyList = function () {
 renderaAdvertisementsNearbyList();
 
 var renderCard = function (advertisement) {
-  var photosArray = advertisement.offer.photos;
-  var cardPopup = cardPopupTemplate.cloneNode(true);
-  var photosElements = cardPopup.querySelectorAll('.popup__photo');
   var roomsCount = advertisement.offer.rooms + ' комнаты для ';
   var guestsCount = advertisement.offer.guests + ' гостей';
   var checkinDescription = 'Заезд после ' + advertisement.offer.checkin;
   var checkoutDescription = ', выезд до ' + advertisement.offer.checkout;
+  var photosArray = advertisement.offer.photos;
+  var cardPopup = cardPopupTemplate.cloneNode(true);
   var fragment = document.createDocumentFragment();
 
   if (photosArray.length) {
@@ -219,7 +218,7 @@ var renderCard = function (advertisement) {
       fragment.appendChild(cardPopupExtraPhoto);
     }
 
-    cardPopup.appendChild(fragment);
+    cardPopup.querySelector('.popup__photos').appendChild(fragment);
   } else {
     cardPopup.querySelector('.popup__photos').remove();
   }
@@ -236,6 +235,8 @@ var renderCard = function (advertisement) {
       .textContent = advertisement.offer.features.join(', ');
   cardPopup.querySelector('.popup__description').textContent = advertisement.offer.description;
   cardPopup.querySelector('.popup__avatar').src = advertisement.author.avatar;
+
+  var photosElements = cardPopup.querySelectorAll('.popup__photo');
 
   for (var j = 0; j < photosArray.length; j++) {
     photosElements[j].src = advertisement.offer.photos[j];
