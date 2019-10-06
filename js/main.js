@@ -73,6 +73,13 @@ var guestsOptions = {
   MAX: 10
 };
 
+var ApartmentType = {
+  'palace': 'Дворец',
+  'flat': 'Квартира',
+  'house': 'Дом',
+  'bungalo': 'Бунгало'
+};
+
 var advertisementsList = [];
 
 var mapContainer = document.querySelector('.map');
@@ -83,6 +90,8 @@ var offerTemplate = document.querySelector('#pin')
     .content
     .querySelector('.map__pin');
 var mapPin = document.querySelector('.map__pin');
+var cardPopupTemplate = document.querySelector('#card').content.querySelector('.map__card');
+var cardPopupPhotoTemplate = cardPopupTemplate.querySelector('.popup__photo');
 
 var getMapPinWidth = function () {
   var mapPinWidth = getComputedStyle(mapPin).width;
@@ -92,6 +101,11 @@ var getMapPinWidth = function () {
 var getMapPinHeight = function () {
   var mapPinHeight = getComputedStyle(mapPin).height;
   return parseInt(mapPinHeight.slice(0, mapPinHeight.length - 2), 10);
+};
+
+var getLocationX = function () {
+  var mapWigth = getComputedStyle(mapContainer).width;
+  return getRandomNumber(0, parseInt(mapWigth.slice(0, mapWigth.length - 2), 10));
 };
 
 var getRandomNumber = function (min, max) {
@@ -127,10 +141,6 @@ var getArrayWithRandomLength = function (arrayElements) {
 };
 
 var generateAdvertisementsList = function () {
-  var getLocationX = function () {
-    var mapWigth = getComputedStyle(mapContainer).width;
-    return getRandomNumber(0, parseInt(mapWigth.slice(0, mapWigth.length - 2), 10));
-  };
   var reorderedAvatarsId = getReorderingArray(avatarOptions.identifiers());
 
   for (var i = 0; i < ADVERTISEMENTS_COUNT; i++) {
@@ -192,4 +202,48 @@ var renderaAdvertisementsNearbyList = function () {
 
 renderaAdvertisementsNearbyList();
 
+var renderCard = function (advertisement) {
+  var roomsCount = advertisement.offer.rooms + ' комнаты для ';
+  var guestsCount = advertisement.offer.guests + ' гостей';
+  var checkinDescription = 'Заезд после ' + advertisement.offer.checkin;
+  var checkoutDescription = ', выезд до ' + advertisement.offer.checkout;
+  var photosArray = advertisement.offer.photos;
+  var cardPopup = cardPopupTemplate.cloneNode(true);
+  var fragment = document.createDocumentFragment();
 
+  if (photosArray.length) {
+    for (var i = 0; i < photosArray.length - 1; i++) {
+      var cardPopupExtraPhoto = cardPopupPhotoTemplate.cloneNode();
+
+      fragment.appendChild(cardPopupExtraPhoto);
+    }
+
+    cardPopup.querySelector('.popup__photos').appendChild(fragment);
+  } else {
+    cardPopup.querySelector('.popup__photos').remove();
+  }
+
+  cardPopup.querySelector('.popup__title').textContent = advertisement.offer.title;
+  cardPopup.querySelector('.popup__text--address').textContent = advertisement.offer.address;
+  cardPopup.querySelector('.popup__text--price')
+      .textContent = advertisement.offer.price + '₽/ночь';
+  cardPopup.querySelector('.popup__type').textContent = ApartmentType[advertisement.offer.type];
+  cardPopup.querySelector('.popup__text--capacity').textContent = roomsCount + guestsCount;
+  cardPopup.querySelector('.popup__text--time')
+      .textContent = checkinDescription + checkoutDescription;
+  cardPopup.querySelector('.popup__features')
+      .textContent = advertisement.offer.features.join(', ');
+  cardPopup.querySelector('.popup__description').textContent = advertisement.offer.description;
+  cardPopup.querySelector('.popup__avatar').src = advertisement.author.avatar;
+
+  var photosElements = cardPopup.querySelectorAll('.popup__photo');
+
+  for (var j = 0; j < photosArray.length; j++) {
+    photosElements[j].src = advertisement.offer.photos[j];
+  }
+
+  return cardPopup;
+};
+
+mapContainer.insertBefore(renderCard(advertisementsList[0]), mapContainer
+    .querySelector('.map__filters-container'));
