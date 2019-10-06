@@ -6,6 +6,8 @@ var DESCRIPTION_TEMPLATE = 'описание';
 var ENTER_KEYCODE = 13;
 var MAP_PIN_WIDTH = 50;
 var MAP_PIN_HEIGHT = 70;
+var ROOM_VALUE_CRIT = 100;
+var CAPACITY_VALUE_CRIT = 0;
 
 var ADVERTISEMENT_TYPE_LIST = [
   'palace',
@@ -100,6 +102,8 @@ var mapFilters = mapContainer.querySelector('.map__filters');
 var mapFeatures = mapFilters.querySelectorAll('.map__features');
 var mapFilterList = mapFilters.querySelectorAll('.map__filter');
 var formAddress = adForm.querySelector('#address');
+var capacity = adForm.querySelector('#capacity');
+var room = adForm.querySelector('#room_number');
 
 var mainPin = {
   width: parseFloat(getComputedStyle(mapPinMain).width),
@@ -311,16 +315,16 @@ mapPinMain.addEventListener('keydown', function (evt) {
 });
 
 // Валидация формы на соответствие количеству человек в номерах
-var capacity = adForm.querySelector('#capacity');
-var room = adForm.querySelector('#room_number');
 
 capacity.addEventListener('input', function (evt) {
   var target = evt.target;
   var roomNumber = parseInt(room.value, 10);
   var capacityNumber = parseInt(target.value, 10);
+  var expresCritical = (roomNumber === ROOM_VALUE_CRIT && capacityNumber !== CAPACITY_VALUE_CRIT);
+  var expresAll = (roomNumber < capacityNumber);
 
-  if ((roomNumber === 100 && capacityNumber !== 0) || (roomNumber < capacityNumber)) {
-    target.setCustomValidity('Недопустимое соотношение комнат и гостей');
+  if (expresCritical || expresAll) {
+    target.setCustomValidity('Несоответствие количества комнат и гостей');
   } else {
     target.setCustomValidity('');
   }
