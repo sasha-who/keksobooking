@@ -7,6 +7,9 @@ var MAP_PIN_WIDTH = 50;
 var MAP_PIN_HEIGHT = 70;
 var ROOM_VALUE_CRIT = 100;
 var CAPACITY_VALUE_CRIT = 0;
+var TITLE_MIN_LENGTH = 30;
+var TITLE_MAX_LENGTH = 100;
+var PRICE_MAX_VALUE = 1000000;
 
 var ADVERTISEMENT_TYPE_LIST = [
   'palace',
@@ -100,6 +103,13 @@ var ApartmentType = {
   'bungalo': 'Бунгало'
 };
 
+var ApartmentTypeMinValue = {
+  'palace': 10000,
+  'flat': 1000,
+  'house': 5000,
+  'bungalo': 0
+};
+
 var advertisementsList = [];
 
 var mapElement = document.querySelector('.map');
@@ -121,6 +131,11 @@ var formAddressField = adFormElement.querySelector('#address');
 var capacityField = adFormElement.querySelector('#capacity');
 var roomField = adFormElement.querySelector('#room_number');
 var submitButton = adFormElement.querySelector('.ad-form__submit');
+var titleField = adFormElement.querySelector('#title');
+var priceField = adFormElement.querySelector('#price');
+var typeField = adFormElement.querySelector('#type');
+var timeinField = adFormElement.querySelector('#timein');
+var timeoutField = adFormElement.querySelector('#timeout');
 
 var getLocationX = function () {
   var mapWigth = getComputedStyle(mapElement).width;
@@ -157,10 +172,6 @@ var getArrayWithRandomLength = function (arrayElements) {
   }
 
   return arrayWithRandomLength;
-};
-
-var changeAttribute = function (element, attribute, value) {
-  element.attribute = value;
 };
 
 var generateAdvertisementsList = function () {
@@ -363,7 +374,7 @@ mainPinElement.addEventListener('keydown', function (evt) {
 });
 
 
-// Валидация формы на соответствие количеству человек в номерах
+// Валидация формы
 submitButton.addEventListener('click', function () {
   var roomNumber = parseInt(roomField.value, 10);
   var capacityNumber = parseInt(capacityField.value, 10);
@@ -377,3 +388,40 @@ submitButton.addEventListener('click', function () {
     capacityField.setCustomValidity('');
   }
 });
+
+var changeAttribute = function (element, attribute, value) {
+  element.setAttribute(attribute, value);
+};
+
+var setPriceMin = function () {
+  var changePriceMin = function () {
+    changeAttribute(priceField, 'min', ApartmentTypeMinValue[typeField.value]);
+  };
+
+  var typeChangeHandler = function () {
+    changePriceMin();
+    changeAttribute(priceField, 'placeholder', ApartmentTypeMinValue[typeField.value]);
+  };
+
+  changePriceMin();
+  typeField.addEventListener('change', typeChangeHandler);
+};
+
+var syncTimeFields = function () {
+  timeinField.addEventListener('change', function () {
+    timeoutField.value = timeinField.value;
+  });
+
+  timeoutField.addEventListener('change', function () {
+    timeinField.value = timeoutField.value;
+  });
+};
+
+changeAttribute(titleField, 'required', true);
+changeAttribute(titleField, 'minlength', TITLE_MIN_LENGTH);
+changeAttribute(titleField, 'maxlength', TITLE_MAX_LENGTH);
+changeAttribute(priceField, 'required', true);
+changeAttribute(priceField, 'max', PRICE_MAX_VALUE);
+changeAttribute(formAddressField, 'readonly', true);
+setPriceMin();
+syncTimeFields();
