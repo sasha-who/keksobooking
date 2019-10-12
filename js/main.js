@@ -12,10 +12,10 @@ var TITLE_MAX_LENGTH = 100;
 var PRICE_MAX_VALUE = 1000000;
 
 var ADVERTISEMENT_TYPE_LIST = [
-  'palace',
-  'flat',
-  'house',
-  'bungalo'
+  'PALACE',
+  'FLAT',
+  'HOUSE',
+  'BUNGALO'
 ];
 
 var ADVERTISEMENT_CHECKIN_LIST = [
@@ -93,22 +93,22 @@ var descriptions = {
   PRICE: '₽/ночь'
 };
 
-var errors = {
+var Errors = {
   ROOMS_GUESTS_MISMATCH: 'Несоответствие количества комнат и гостей'
 };
 
 var ApartmentType = {
-  'palace': 'Дворец',
-  'flat': 'Квартира',
-  'house': 'Дом',
-  'bungalo': 'Бунгало'
+  'PALACE': 'Дворец',
+  'FLAT': 'Квартира',
+  'HOUSE': 'Дом',
+  'BUNGALO': 'Бунгало'
 };
 
 var ApartmentTypeMinValue = {
-  'palace': 10000,
-  'flat': 1000,
-  'house': 5000,
-  'bungalo': 0
+  PALACE: 10000,
+  FLAT: 1000,
+  HOUSE: 5000,
+  BUNGALO: 0
 };
 
 var advertisementsList = [];
@@ -358,7 +358,8 @@ var renderCard = function () {
       // [index - 1] — сдвиг нужен из-за первого элемента в mapPinElements (главная метка)
       mapElement.insertBefore(cards[index - 1], mapFiltersContainer);
 
-      getMapCardElement().querySelector('.popup__close').addEventListener('click', popupCloseClickHandler);
+      getMapCardElement().querySelector('.popup__close')
+          .addEventListener('click', popupCloseClickHandler);
       document.addEventListener('keydown', popupEscPressHandler);
     };
 
@@ -398,24 +399,32 @@ submitButton.addEventListener('click', function () {
   var roomsFewer = (roomNumber < capacityNumber);
 
   if (roomsFewer || roomCrit && !capacityCrit || !roomCrit && capacityCrit) {
-    capacityField.setCustomValidity(errors.ROOMS_GUESTS_MISMATCH);
+    capacityField.setCustomValidity(Errors.ROOMS_GUESTS_MISMATCH);
   } else {
     capacityField.setCustomValidity('');
   }
 });
+
+// var changeAttribute = function (element, attribute, value) {
+//   element.attribute = value;
+// };
 
 var changeAttribute = function (element, attribute, value) {
   element.setAttribute(attribute, value);
 };
 
 var setPriceMin = function () {
+  var getTypeValue = function () {
+    return ApartmentTypeMinValue[typeField.value.toUpperCase()];
+  };
+
   var changePriceMin = function () {
-    changeAttribute(priceField, 'min', ApartmentTypeMinValue[typeField.value]);
+    changeAttribute(priceField, 'min', getTypeValue());
   };
 
   var typeChangeHandler = function () {
     changePriceMin();
-    changeAttribute(priceField, 'placeholder', ApartmentTypeMinValue[typeField.value]);
+    changeAttribute(priceField, 'placeholder', getTypeValue());
   };
 
   changePriceMin();
