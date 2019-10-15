@@ -247,11 +247,13 @@ var generateCards = function () {
     var fragment = document.createDocumentFragment();
 
     if (photos.length > 0) {
-      for (var i = 0; i < photos.length - 1; i++) {
-        var cardPopupExtraPhoto = cardPopupPhotoTemplate.cloneNode();
+      photos.forEach(function (item, index, array) {
+        if (index < array.length - 1) {
+          var cardPopupExtraPhoto = cardPopupPhotoTemplate.cloneNode();
 
-        fragment.appendChild(cardPopupExtraPhoto);
-      }
+          fragment.appendChild(cardPopupExtraPhoto);
+        }
+      });
 
       cardPopup.querySelector('.popup__photos').appendChild(fragment);
     } else {
@@ -280,9 +282,9 @@ var generateCards = function () {
     return cardPopup;
   };
 
-  for (var i = 0; i < advertisementsList.length; i++) {
-    cards.push(createCard(advertisementsList[i]));
-  }
+  advertisementsList.forEach(function (item) {
+    cards.push(createCard(item));
+  });
 };
 
 var mainPin = {
