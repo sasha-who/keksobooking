@@ -30,27 +30,37 @@
   var timeoutField = adFormElement.querySelector('#timeout');
   var formAddressField = adFormElement.querySelector('#address');
 
-  var mainPin = {
-    width: parseFloat(getComputedStyle(window.utils.mainPinElement).width),
-    height: parseFloat(getComputedStyle(window.utils.mainPinElement).height),
-    pointerHeight: parseFloat(getComputedStyle(window.utils.mainPinElement, ':after').height),
-    left: parseFloat(window.utils.mainPinElement.style.left),
-    top: parseFloat(window.utils.mainPinElement.style.top)
-  };
+  var addMainPinLocation = function (isInactive) {
+    var mainPin = {
+      width: parseFloat(getComputedStyle(window.utils.mainPinElement).width),
+      height: parseFloat(getComputedStyle(window.utils.mainPinElement).height),
+      pointerHeight: parseFloat(getComputedStyle(window.utils.mainPinElement, ':after').height),
+      getLeft: function () {
+        return parseFloat(window.utils.mainPinElement.style.left);
+      },
+      getTop: function () {
+        return parseFloat(window.utils.mainPinElement.style.top);
+      }
+    };
 
-  var getPinLocationX = function () {
-    return mainPin.left + mainPin.width / 2;
-  };
+    var getPinLocationX = function () {
+      return mainPin.getLeft() + mainPin.width / 2;
+    };
 
-  var getPinLocationY = function () {
-    return mainPin.top + mainPin.height;
-  };
+    var getPinLocationY = function () {
+      return mainPin.getTop() + mainPin.height;
+    };
 
-  var getPinActivelocationY = function () {
-    return mainPin.top + mainPin.height + mainPin.pointerHeight;
-  };
+    var getPinActivelocationY = function () {
+      return mainPin.getTop() + mainPin.height + mainPin.pointerHeight;
+    };
 
-  var addMainPinLocation = function () {
+    // Флаг для задания координат в неактивном состоянии
+    if (isInactive) {
+      formAddressField.value = getPinLocationX() + ', ' + getPinLocationY();
+      return;
+    }
+
     formAddressField.value = getPinLocationX() + ', ' + getPinActivelocationY();
   };
 
@@ -65,7 +75,7 @@
   setActiveStatus(adFormElements, true);
   mapFeatures.disabled = true;
   setActiveStatus(mapFilters, true);
-  formAddressField.value = getPinLocationX() + ', ' + getPinLocationY();
+  addMainPinLocation(true);
 
   // Валидация
   submitButton.addEventListener('click', function () {
@@ -135,6 +145,7 @@
       mapFeatures.disabled = false;
       setActiveStatus(mapFilters, false);
       addMainPinLocation();
-    }
+    },
+    addMainPinLocation: addMainPinLocation
   };
 })();
