@@ -22,7 +22,6 @@
   var mapFilters = mapFiltersElement.querySelectorAll('.map__filter');
   var capacityField = adFormElement.querySelector('#capacity');
   var roomField = adFormElement.querySelector('#room_number');
-  var submitButton = adFormElement.querySelector('.ad-form__submit');
   var titleField = adFormElement.querySelector('#title');
   var priceField = adFormElement.querySelector('#price');
   var typeField = adFormElement.querySelector('#type');
@@ -78,7 +77,9 @@
   addMainPinLocation(true);
 
   // Валидация
-  submitButton.addEventListener('click', function () {
+  adFormElement.addEventListener('submit', function (evt) {
+    evt.preventDefault();
+
     var roomNumber = parseInt(roomField.value, 10);
     var capacityNumber = parseInt(capacityField.value, 10);
     var roomCrit = (roomNumber === ROOM_VALUE_CRIT);
@@ -92,12 +93,8 @@
     }
   });
 
-  // var changeAttribute = function (element, attribute, value) {
-  //   element.attribute = value;
-  // };
-
   var changeAttribute = function (element, attribute, value) {
-    element.setAttribute(attribute, value);
+    element[attribute] = value;
   };
 
   var setPriceMin = function () {

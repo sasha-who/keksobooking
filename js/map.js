@@ -19,8 +19,6 @@
     'BUNGALO': 'Бунгало'
   };
 
-  var cards = [];
-
   var offers = window.utils.mapElement.querySelector('.map__pins');
   var offerTemplate = document.querySelector('#pin')
       .content.querySelector('.map__pin');
@@ -61,19 +59,19 @@
       var cardPopup = cardPopupTemplate.cloneNode(true);
       var fragment = document.createDocumentFragment();
 
-      if (photos.length > 0) {
-        photos.forEach(function (item, index, array) {
-          if (index < array.length - 1) {
-            var cardPopupExtraPhoto = cardPopupPhotoTemplate.cloneNode();
+      cardPopup.querySelector('.popup__photo').remove();
+      photos.forEach(function () {
+        var cardPopupPhoto = cardPopupPhotoTemplate.cloneNode();
 
-            fragment.appendChild(cardPopupExtraPhoto);
-          }
-        });
+        fragment.appendChild(cardPopupPhoto);
+      });
+      cardPopup.querySelector('.popup__photos').appendChild(fragment);
 
-        cardPopup.querySelector('.popup__photos').appendChild(fragment);
-      } else {
-        cardPopup.querySelector('.popup__photos').remove();
-      }
+      var photosElements = cardPopup.querySelectorAll('.popup__photo');
+
+      photosElements.forEach(function (item, index) {
+        item.src = advertisement.offer.photos[index];
+      });
 
       cardPopup.querySelector('.popup__title').textContent = advertisement.offer.title;
       cardPopup.querySelector('.popup__text--address').textContent = advertisement.offer.address;
@@ -88,19 +86,15 @@
       cardPopup.querySelector('.popup__description').textContent = advertisement.offer.description;
       cardPopup.querySelector('.popup__avatar').src = advertisement.author.avatar;
 
-      var photosElements = cardPopup.querySelectorAll('.popup__photo');
-
-      photosElements.forEach(function (item, index) {
-        item.src = advertisement.offer.photos[index];
-      });
-
       return cardPopup;
     };
 
-    window.data.advertisements.forEach(function (item) {
-      cards.push(createCard(item));
+    return window.data.advertisements.map(function (item) {
+      return createCard(item);
     });
   };
+
+  var cards = generateCards();
 
   var renderCard = function () {
     var mapPinElements = offers.querySelectorAll('.map__pin');
@@ -122,8 +116,6 @@
     var popupCloseClickHandler = function () {
       removePopup();
     };
-
-    generateCards();
 
     Array.from(mapPinElements).forEach(function (item, index) {
       var pinClickHandler = function () {
@@ -170,6 +162,7 @@
       max: parseFloat(window.data.mapWigth) - mainPinWidth
     };
 
+    // Нужно заменить на  конструктор
     var startCoords = {
       x: evt.clientX,
       y: evt.clientY
