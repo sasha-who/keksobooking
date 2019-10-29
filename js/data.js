@@ -75,11 +75,7 @@
   };
 
   var advertisementsList = [];
-
-  var getLocationX = function () {
-    var mapWigth = getComputedStyle(window.utils.mapElement).width;
-    return getRandomNumber(0, parseInt(mapWigth.slice(0, mapWigth.length - 2), 10));
-  };
+  var mapWigth = getComputedStyle(window.utils.mapElement).width;
 
   var getRandomNumber = function (min, max) {
     min = Math.ceil(min);
@@ -117,6 +113,10 @@
     var reorderedAvatarsId = getReorderingArray(avatarOptions.identifiers());
 
     for (var i = 0; i < ADVERTISEMENTS_COUNT; i++) {
+      var getLocationX = function () {
+        return getRandomNumber(0, parseInt(mapWigth.slice(0, mapWigth.length - 2), 10));
+      };
+
       var locationX = getLocationX();
       var locationY = getRandomNumber(locationYOptions.MIN, locationYOptions.MAX);
 
@@ -154,6 +154,8 @@
   advertisementsList = generateAdvertisementsList();
 
   window.data = {
-    advertisements: advertisementsList
+    advertisements: advertisementsList,
+    locationYOptions: locationYOptions,
+    mapWigth: mapWigth
   };
 })();
