@@ -1,6 +1,8 @@
 'use strict';
 
 (function () {
+  var URL = 'https://js.dump.academy/keksobooking/data';
+  var ADVERTISEMENTS_COUNT = 8;
   var MAP_PIN_WIDTH = 50;
   var MAP_PIN_HEIGHT = 70;
 
@@ -19,14 +21,34 @@
     'BUNGALO': 'Бунгало'
   };
 
+  var locationYOptions = {
+    MIN: 130,
+    MAX: 630
+  };
+
   var offers = window.utils.mapElement.querySelector('.map__pins');
   var offerTemplate = document.querySelector('#pin')
       .content.querySelector('.map__pin');
   var mapFiltersContainer = document.querySelector('.map__filters-container');
   var cardPopupTemplate = document.querySelector('#card').content.querySelector('.map__card');
   var cardPopupPhotoTemplate = cardPopupTemplate.querySelector('.popup__photo');
+  var errorTemplate = document.querySelector('#error').content.querySelector('.error');
 
-  // Метки
+  var mapWigth = getComputedStyle(window.utils.mapElement).width;
+
+  var advertisementsList = [];
+
+  var getReorderingArray = function (arrayElements) {
+    for (var i = arrayElements.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var temp = arrayElements[i];
+      arrayElements[i] = arrayElements[j];
+      arrayElements[j] = temp;
+    }
+
+    return arrayElements;
+  };
+
   var renderAdvertisement = function (advertisement) {
     var advertisementElement = offerTemplate.cloneNode(true);
 
@@ -41,8 +63,8 @@
   var renderAdvertisementsNearbyList = function () {
     var fragment = document.createDocumentFragment();
 
-    for (var i = 0; i < window.data.advertisements.length; i++) {
-      fragment.appendChild(renderAdvertisement(window.data.advertisements[i]));
+    for (var i = 0; i < advertisementsList.length; i++) {
+      fragment.appendChild(renderAdvertisement(advertisementsList[i]));
     }
 
     offers.appendChild(fragment);
@@ -89,12 +111,10 @@
       return cardPopup;
     };
 
-    return window.data.advertisements.map(function (item) {
+    return advertisementsList.map(function (item) {
       return createCard(item);
     });
   };
-
-  var cards = generateCards();
 
   var renderCard = function () {
     var mapPinElements = offers.querySelectorAll('.map__pin');
@@ -116,6 +136,8 @@
     var popupCloseClickHandler = function () {
       removePopup();
     };
+
+    var cards = generateCards();
 
     Array.from(mapPinElements).forEach(function (item, index) {
       var pinClickHandler = function () {
@@ -159,7 +181,7 @@
 
     var critLocationX = {
       MIN: 0,
-      max: parseFloat(window.data.mapWigth) - mainPinWidth
+      max: parseFloat(mapWigth) - mainPinWidth
     };
 
     // Нужно заменить на  конструктор
@@ -190,14 +212,14 @@
           .style.top = (window.utils.mainPinElement.offsetTop - shift.y) + 'px';
 
       // Выход за границы карты
-      if (pointTopPosition < window.data.locationYOptions.MIN) {
+      if (pointTopPosition < locationYOptions.MIN) {
         window.utils.mainPinElement
-            .style.top = (window.data.locationYOptions.MIN - mainPinActiveHeight) + 'px';
+            .style.top = (locationYOptions.MIN - mainPinActiveHeight) + 'px';
       }
 
-      if (pointTopPosition > window.data.locationYOptions.MAX) {
+      if (pointTopPosition > locationYOptions.MAX) {
         window.utils.mainPinElement
-            .style.top = (window.data.locationYOptions.MAX - mainPinActiveHeight) + 'px';
+            .style.top = (locationYOptions.MAX - mainPinActiveHeight) + 'px';
       }
 
       if (window.utils.mainPinElement.offsetLeft < critLocationX.MIN) {
@@ -222,20 +244,38 @@
     document.addEventListener('mouseup', mouseUpHandler);
   };
 
-  var activateAll = function (evt) {
+  var successHandler = function (advertisements) {
+    var reorderedAdvertisements = getReorderingArray(advertisements);
+    for (var i = 0; i < ADVERTISEMENTS_COUNT; i++) {
+      advertisementsList.push(reorderedAdvertisements[i]);
+    }
+  };
+
+  var errorHandler = function (errorMessage) {
+    var errorElement = errorTemplate.cloneNode(true);
+
+    errorElement.querySelector('.error__message').textContent = errorMessage;
+    document.querySelector('main').appendChild(errorElement);
+  };
+
+  var activateAll = function () {
     activateMap();
     window.form.activateForm();
     renderCard();
+  };
+
+  var activateByClick = function (evt) {
+    window.load(URL, successHandler, errorHandler, activateAll);
     movePin(evt);
   };
 
   var mainPinMouseDownHandler = function (evt) {
-    activateAll(evt);
+    activateByClick(evt);
   };
 
   var mainPinKeyDownHandler = function (evt) {
     if (evt.key === window.utils.keys.ENTER) {
-      activateAll();
+      activateByClick(evt);
     }
   };
 
