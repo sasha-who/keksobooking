@@ -27,7 +27,6 @@
   var mapFiltersContainer = document.querySelector('.map__filters-container');
   var cardPopupTemplate = document.querySelector('#card').content.querySelector('.map__card');
   var cardPopupPhotoTemplate = cardPopupTemplate.querySelector('.popup__photo');
-  var errorTemplate = document.querySelector('#error').content.querySelector('.error');
 
   var advertisementsList = [];
 
@@ -153,7 +152,7 @@
     });
   };
 
-  // Обработчики ответа сервера
+  // Активация карты и формы
   var successHandler = function (advertisements) {
     var reorderedAdvertisements = getReorderingArray(advertisements);
     for (var i = 0; i < ADVERTISEMENTS_COUNT; i++) {
@@ -161,22 +160,12 @@
     }
   };
 
-  var errorHandler = function (errorMessage) {
-    var errorElement = errorTemplate.cloneNode(true);
-
-    errorElement.querySelector('.error__message').textContent = errorMessage;
-    document.querySelector('main').appendChild(errorElement);
-  };
-
-  // Активация карты и формы
-  var isRender = false;
-
   var activateMap = function () {
     window.utils.mapElement.classList.remove('map--faded');
 
-    if (!isRender) {
+    if (!window.utils.isRender) {
       renderAdvertisementsNearbyList();
-      isRender = true;
+      window.utils.isRender = true;
     }
   };
 
@@ -187,7 +176,7 @@
   };
 
   var happeningByClick = function (evt) {
-    window.load(URL, successHandler, errorHandler, activateAll);
+    window.backend.load(URL, successHandler, window.backend.errorHandler, activateAll);
     window.move(evt);
   };
 

@@ -1,6 +1,7 @@
 'use strict';
 
 (function () {
+  var URL = 'https://js.dump.academy/keksobooking';
   var ROOM_VALUE_CRIT = 100;
   var CAPACITY_VALUE_CRIT = 0;
   var TITLE_MIN_LENGTH = 30;
@@ -12,6 +13,11 @@
     FLAT: 1000,
     HOUSE: 5000,
     BUNGALO: 0
+  };
+
+  var pinInitialCoords = {
+    TOP: '375px',
+    LEFT: '570px'
   };
 
   var adFormElement = document.querySelector('.ad-form');
@@ -28,6 +34,7 @@
   var timeinField = adFormElement.querySelector('#timein');
   var timeoutField = adFormElement.querySelector('#timeout');
   var formAddressField = adFormElement.querySelector('#address');
+  var successTemplate = document.querySelector('#success').content.querySelector('.success');
 
   var addMainPinLocation = function (isInactive) {
     var mainPin = {
@@ -69,17 +76,72 @@
     });
   };
 
-  // Форма в неактивном состоянии
-  adFormHeaderElement.disabled = true;
-  setActiveStatus(adFormElements, true);
-  mapFeatures.disabled = true;
-  setActiveStatus(mapFilters, true);
-  addMainPinLocation(true);
+  // Изначальное состояние — форма деактивирована
+  var deactivateForm = function () {
+    adFormElement.classList.add('ad-form--disabled');
+    adFormHeaderElement.disabled = true;
+    setActiveStatus(adFormElements, true);
+    mapFeatures.disabled = true;
+    setActiveStatus(mapFilters, true);
+    addMainPinLocation(true);
+  };
+
+  deactivateForm();
 
   // Валидация
-  adFormElement.addEventListener('submit', function (evt) {
-    evt.preventDefault();
+  var successHandler = function () {
+    // Возвращает в неактивное состояние после отправки данных
+    var pins = window.utils.mapElement.querySelectorAll('.map__pin');
+    var card = window.utils.mapElement.querySelector('.map__card');
 
+    for (var i = 1; i < pins.length; i++) {
+      pins[i].remove();
+    }
+
+    if (card) {
+      card.remove();
+    }
+
+    window.utils.mainPinElement.style.top = pinInitialCoords.TOP;
+    window.utils.mainPinElement.style.left = pinInitialCoords.LEFT;
+
+    window.utils.mapElement.classList.add('map--faded');
+    adFormElement.reset();
+    deactivateForm();
+    window.utils.isRender = false;
+
+    var getSuccessOverlay = function () {
+      return window.utils.mainElement.querySelector('.success');
+    };
+
+    if (!getSuccessOverlay()) {
+      var successElement = successTemplate.cloneNode(true);
+
+      window.utils.mainElement.appendChild(successElement);
+
+      var successOverlay = getSuccessOverlay();
+
+      var removeOverlay = function () {
+        successOverlay.remove();
+      };
+
+      var overlayClickHandler = function () {
+        removeOverlay();
+      };
+
+      var overlayKeydownHandler = function (evt) {
+        if (evt.key === window.utils.keys.ESCAPE) {
+          removeOverlay();
+          document.removeEventListener('keydown', overlayKeydownHandler);
+        }
+      };
+
+      successOverlay.addEventListener('click', overlayClickHandler);
+      document.addEventListener('keydown', overlayKeydownHandler);
+    }
+  };
+
+  adFormElement.addEventListener('submit', function (evt) {
     var roomNumber = parseInt(roomField.value, 10);
     var capacityNumber = parseInt(capacityField.value, 10);
     var roomCrit = (roomNumber === ROOM_VALUE_CRIT);
@@ -91,10 +153,13 @@
     } else {
       capacityField.setCustomValidity('');
     }
+
+    window.backend.send(URL, new FormData(adFormElement), successHandler, window.backend.errorHandler);
+    evt.preventDefault();
   });
 
   var changeAttribute = function (element, attribute, value) {
-    element[attribute] = value;
+    element.setAttribute(attribute, value);
   };
 
   var setPriceMin = function () {
