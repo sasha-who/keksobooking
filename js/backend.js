@@ -1,69 +1,86 @@
 'use strict';
 
 (function () {
-  var SUCCESS_CODE = 200;
+  var URL_LOAD = 'https://js.dump.academy/keksobooking/data';
+  var URL_SEND = 'https://js.dump.academy/keksobooking';
   var TIMEOUT = 10000;
+
+  var HttpCode = {
+    SUCCESS: 200,
+    INVALID: 400,
+    NOT_AUTHORIZED: 401,
+    NOT_FOUND: 404,
+    SERVER: 500
+  };
+
+  var Error = {
+    INVALID: 'Неверный запрос',
+    NOT_AUTHORIZED: 'Пользователь не авторизован',
+    NOT_FOUND: 'Ничего не найдено',
+    SERVER: 'Ошибка сервера',
+    CONNECTION: 'Произошла ошибка соединения',
+    LONG_ANSWER: 'Слишком долгий ответ сервера'
+  };
 
   var errorTemplate = document.querySelector('#error').content.querySelector('.error');
 
+  var setupXHR = function (url, successHandler, errorHandler, cb) {
+    var xhr = new XMLHttpRequest();
+
+    xhr.responseType = 'json';
+
+    xhr.open('GET', url);
+
+    xhr.timeout = TIMEOUT;
+
+    xhr.addEventListener('load', function () {
+      var error;
+
+      switch (xhr.status) {
+        case HttpCode.SUCCESS:
+          successHandler(xhr.response);
+          if (cb) {
+            cb();
+          }
+          break;
+
+        case HttpCode.INVALID:
+          error = Error.INVALID;
+          break;
+
+        case HttpCode.NOT_AUTHORIZED:
+          error = Error.NOT_AUTHORIZED;
+          break;
+
+        case HttpCode.NOT_FOUND:
+          error = Error.NOT_FOUND;
+          break;
+
+        case HttpCode.SERVER:
+          error = Error.SERVER;
+          break;
+
+        default:
+          error = 'Статус ответа: ' + xhr.status + ' ' + xhr.statusText;
+      }
+
+      if (error) {
+        errorHandler(error);
+      }
+    });
+
+    xhr.addEventListener('error', function () {
+      errorHandler(Error.CONNECTION);
+    });
+
+    xhr.addEventListener('timeout', function () {
+      errorHandler(Error.LONG_ANSWER);
+    });
+
+    return xhr;
+  };
+
   window.backend = {
-    load: function (url, successHandler, errorHandler, cb) {
-      var xhr = new XMLHttpRequest();
-
-      xhr.responseType = 'json';
-
-      xhr.open('GET', url);
-
-      xhr.timeout = TIMEOUT;
-
-      xhr.addEventListener('load', function () {
-        if (xhr.status === SUCCESS_CODE) {
-          successHandler(xhr.response);
-          cb();
-        } else {
-          errorHandler('Статус ответа: ' + xhr.status + ' ' + xhr.statusText);
-        }
-      });
-
-      xhr.addEventListener('error', function () {
-        errorHandler('Произошла ошибка соединения');
-      });
-
-      xhr.addEventListener('timeout', function () {
-        errorHandler('Слишком долгий ответ сервера');
-      });
-
-      xhr.send();
-    },
-
-    send: function (url, data, successHandler, errorHandler) {
-      var xhr = new XMLHttpRequest();
-
-      xhr.responseType = 'json';
-
-      xhr.open('POST', url);
-
-      xhr.timeout = TIMEOUT;
-
-      xhr.addEventListener('load', function () {
-        if (xhr.status === SUCCESS_CODE) {
-          successHandler(xhr.response);
-        } else {
-          errorHandler('Статус ответа: ' + xhr.status + ' ' + xhr.statusText);
-        }
-      });
-
-      xhr.addEventListener('error', function () {
-        errorHandler('Произошла ошибка соединения');
-      });
-
-      xhr.addEventListener('timeout', function () {
-        errorHandler('Слишком долгий ответ сервера');
-      });
-
-      xhr.send(data);
-    },
-
     errorHandler: function (errorMessage) {
       var getErrorOverlay = function () {
         return window.utils.mainElement.querySelector('.error');
@@ -97,6 +114,16 @@
         errorButton.addEventListener('click', overlayClickHandler);
         document.addEventListener('keydown', overlayKeydownHandler);
       }
+    },
+
+    load: function (successHandler, errorHandler, cb) {
+      var xhr = setupXHR(URL_LOAD, successHandler, errorHandler, cb);
+      xhr.send();
+    },
+
+    send: function (data, successHandler, errorHandler, cb) {
+      var xhr = setupXHR(URL_SEND, successHandler, errorHandler, cb);
+      xhr.send(data);
     }
   };
 })();

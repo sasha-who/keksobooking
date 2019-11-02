@@ -1,7 +1,6 @@
 'use strict';
 
 (function () {
-  var URL = 'https://js.dump.academy/keksobooking/data';
   var ADVERTISEMENTS_COUNT = 5;
   var MAP_PIN_WIDTH = 50;
   var MAP_PIN_HEIGHT = 70;
@@ -163,18 +162,18 @@
     renderCard(advertisementsList);
   };
 
-  var happeningByClick = function (evt) {
-    window.backend.load(URL, successHandler, window.backend.errorHandler, activateAll);
+  var happenByClick = function (evt) {
+    window.backend.load(successHandler, window.backend.errorHandler, activateAll);
     window.move(evt);
   };
 
   var mainPinMouseDownHandler = function (evt) {
-    happeningByClick(evt);
+    happenByClick(evt);
   };
 
   var mainPinKeyDownHandler = function (evt) {
     if (evt.key === window.utils.keys.ENTER) {
-      happeningByClick(evt);
+      happenByClick(evt);
     }
   };
 

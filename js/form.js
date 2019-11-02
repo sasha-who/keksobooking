@@ -1,7 +1,6 @@
 'use strict';
 
 (function () {
-  var URL = 'https://js.dump.academy/keksobooking';
   var ROOM_VALUE_CRIT = 100;
   var CAPACITY_VALUE_CRIT = 0;
   var TITLE_MIN_LENGTH = 30;
@@ -89,8 +88,7 @@
   deactivateForm();
 
   // Валидация
-  var successHandler = function () {
-    // Возвращает в неактивное состояние после отправки данных
+  var cleanMap = function () {
     var pins = window.utils.mapElement.querySelectorAll('.map__pin');
     var card = window.utils.mapElement.querySelector('.map__card');
 
@@ -101,7 +99,11 @@
     if (card) {
       card.remove();
     }
+  };
 
+  var successHandler = function () {
+    // Возвращает в неактивное состояние после отправки данных
+    cleanMap();
     window.utils.mainPinElement.style.top = pinInitialCoords.TOP;
     window.utils.mainPinElement.style.left = pinInitialCoords.LEFT;
 
@@ -154,13 +156,17 @@
       capacityField.setCustomValidity('');
     }
 
-    window.backend.send(URL, new FormData(adFormElement), successHandler, window.backend.errorHandler);
+    window.backend.send(new FormData(adFormElement), successHandler, window.backend.errorHandler);
     evt.preventDefault();
   });
 
   var changeAttribute = function (element, attribute, value) {
     element.setAttribute(attribute, value);
   };
+
+  // var changeAttribute = function (element, attribute, value) {
+  //   element[attribute] = value;
+  // };
 
   var setPriceMin = function () {
     var getTypeValue = function () {
@@ -208,6 +214,7 @@
       setActiveStatus(mapFilters, false);
       addMainPinLocation();
     },
-    addMainPinLocation: addMainPinLocation
+    addMainPinLocation: addMainPinLocation,
+    cleanMap: cleanMap
   };
 })();
