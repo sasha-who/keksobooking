@@ -1,8 +1,7 @@
 'use strict';
 
 (function () {
-  var URL = 'https://js.dump.academy/keksobooking/data';
-  var ADVERTISEMENTS_COUNT = 8;
+  var ADVERTISEMENTS_COUNT = 5;
   var MAP_PIN_WIDTH = 50;
   var MAP_PIN_HEIGHT = 70;
 
@@ -30,17 +29,6 @@
 
   var advertisementsList = [];
 
-  var getReorderingArray = function (arrayElements) {
-    for (var i = arrayElements.length - 1; i > 0; i--) {
-      var j = Math.floor(Math.random() * (i + 1));
-      var temp = arrayElements[i];
-      arrayElements[i] = arrayElements[j];
-      arrayElements[j] = temp;
-    }
-
-    return arrayElements;
-  };
-
   // Объявления
   var renderAdvertisement = function (advertisement) {
     var advertisementElement = offerTemplate.cloneNode(true);
@@ -53,18 +41,20 @@
     return advertisementElement;
   };
 
-  var renderAdvertisementsNearbyList = function () {
+  var renderAdvertisementsNearbyList = function (advertisements) {
     var fragment = document.createDocumentFragment();
 
-    for (var i = 0; i < advertisementsList.length; i++) {
-      fragment.appendChild(renderAdvertisement(advertisementsList[i]));
+    for (var i = 0; i < ADVERTISEMENTS_COUNT; i++) {
+      if (advertisements[i]) {
+        fragment.appendChild(renderAdvertisement(advertisements[i]));
+      }
     }
 
     offers.appendChild(fragment);
   };
 
   // Карточки
-  var generateCards = function () {
+  var generateCards = function (advertisements) {
     var createCard = function (advertisement) {
       var roomsCount = advertisement.offer.rooms + descriptions.ROOMS;
       var guestsCount = advertisement.offer.guests + descriptions.GUESTS;
@@ -104,38 +94,38 @@
       return cardPopup;
     };
 
-    return advertisementsList.map(function (item) {
+    return advertisements.map(function (item) {
       return createCard(item);
     });
   };
 
-  var renderCard = function () {
+  var renderCard = function (advertisements) {
     var mapPinElements = offers.querySelectorAll('.map__pin');
 
     var getMapCardElement = function () {
       return window.utils.mapElement.querySelector('.map__card');
     };
 
-    var removePopup = function () {
+    var removeCard = function () {
       getMapCardElement().remove();
     };
 
     var popupEscPressHandler = function (evt) {
       if (evt.key === window.utils.keys.ESCAPE) {
-        removePopup();
+        removeCard();
       }
     };
 
     var popupCloseClickHandler = function () {
-      removePopup();
+      removeCard();
     };
 
-    var cards = generateCards();
+    var cards = generateCards(advertisements);
 
     Array.from(mapPinElements).forEach(function (item, index) {
       var pinClickHandler = function () {
         if (getMapCardElement()) {
-          removePopup();
+          removeCard();
         }
 
         // [index - 1] — сдвиг нужен из-за первого элемента в mapPinElements (главная метка)
@@ -154,17 +144,14 @@
 
   // Активация карты и формы
   var successHandler = function (advertisements) {
-    var reorderedAdvertisements = getReorderingArray(advertisements);
-    for (var i = 0; i < ADVERTISEMENTS_COUNT; i++) {
-      advertisementsList.push(reorderedAdvertisements[i]);
-    }
+    advertisementsList = advertisements.slice();
   };
 
   var activateMap = function () {
     window.utils.mapElement.classList.remove('map--faded');
 
     if (!window.utils.isRender) {
-      renderAdvertisementsNearbyList();
+      renderAdvertisementsNearbyList(advertisementsList);
       window.utils.isRender = true;
     }
   };
@@ -172,24 +159,32 @@
   var activateAll = function () {
     activateMap();
     window.form.activateForm();
-    renderCard();
+    renderCard(advertisementsList);
   };
 
-  var happeningByClick = function (evt) {
-    window.backend.load(URL, successHandler, window.backend.errorHandler, activateAll);
+  var happenByClick = function (evt) {
+    window.backend.load(successHandler, window.backend.errorHandler, activateAll);
     window.move(evt);
   };
 
   var mainPinMouseDownHandler = function (evt) {
-    happeningByClick(evt);
+    happenByClick(evt);
   };
 
   var mainPinKeyDownHandler = function (evt) {
     if (evt.key === window.utils.keys.ENTER) {
-      happeningByClick(evt);
+      happenByClick(evt);
     }
   };
 
   window.utils.mainPinElement.addEventListener('mousedown', mainPinMouseDownHandler);
   window.utils.mainPinElement.addEventListener('keydown', mainPinKeyDownHandler);
+
+  window.map = {
+    getAdvertisementsList: function () {
+      return advertisementsList;
+    },
+    renderAdvertisementsNearbyList: renderAdvertisementsNearbyList,
+    renderCard: renderCard
+  };
 })();
