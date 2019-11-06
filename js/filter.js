@@ -2,6 +2,28 @@
 
 (function () {
   var ANY_VALUE = 'any';
+  var DEBOUNCE_INTERVAL = 500;
+
+  var RoomsValue = {
+    MIN: 1,
+    MAX: 3
+  };
+
+  var GuestsValue = {
+    MIN: 0,
+    MAX: 2
+  };
+
+  var PriceValue = {
+    LOW: 10000,
+    HIGH: 50000
+  };
+
+  var PriceDescription = {
+    LOW: 'low',
+    MIDDLE: 'middle',
+    HIGH: 'high'
+  };
 
   var typeElement = window.utils.mapElement.querySelector('#housing-type');
   var priceElement = window.utils.mapElement.querySelector('#housing-price');
@@ -10,76 +32,82 @@
   var selectElements = window.utils.mapElement.querySelectorAll('.map__filter');
   var checkboxElements = window.utils.mapElement.querySelectorAll('.map__checkbox');
 
-  var getSuitable = function (adv) {
-    var isSuitable = true;
+  var lastTimeout;
 
+  var debounce = function (cb) {
+    if (lastTimeout) {
+      window.clearTimeout(lastTimeout);
+    }
+
+    lastTimeout = window.setTimeout(cb, DEBOUNCE_INTERVAL);
+  };
+
+  var getPropertyValue = function (property, min, max) {
+    if (property >= min && property <= max) {
+      return String(property);
+    }
+
+    return ANY_VALUE;
+  };
+
+  var getSuitable = function (adv) {
     var checkType = function () {
       if (typeElement.value === ANY_VALUE) {
-        return;
+        return true;
       }
 
-      if (adv.offer.type !== typeElement.value) {
-        isSuitable = false;
-      }
+      return adv.offer.type === typeElement.value;
     };
 
     var checkPrice = function () {
       if (priceElement.value === ANY_VALUE) {
-        return;
+        return true;
       }
 
       var getPriceRange = function () {
-        if (adv.offer.price < 10000) {
-          return 'low';
-        } else if (adv.offer.price >= 10000 && adv.offer.price <= 50000) {
-          return 'middle';
-        } else if (adv.offer.price > 50000) {
-          return 'high';
+        var price = adv.offer.price;
+
+        switch (true) {
+          case price < PriceValue.LOW:
+            return PriceDescription.LOW;
+          case price >= PriceValue.LOW && price <= PriceValue.HIGH:
+            return PriceDescription.MIDDLE;
+          case price > PriceValue.HIGH:
+            return PriceDescription.HIGH;
+          default:
+            return ANY_VALUE;
         }
-        return 'any';
       };
 
-      if (getPriceRange() !== priceElement.value) {
-        isSuitable = false;
-      }
+      return getPriceRange() === priceElement.value;
     };
 
     var checkRooms = function () {
       if (roomsElement.value === ANY_VALUE) {
-        return;
+        return true;
       }
 
-      var rooms = ANY_VALUE;
+      var rooms = getPropertyValue(adv.offer.rooms, RoomsValue.MIN, RoomsValue.MAX);
 
-      if (adv.offer.rooms >= 1 && adv.offer.rooms <= 3) {
-        rooms = String(adv.offer.rooms);
-      }
-
-      if (rooms !== roomsElement.value) {
-        isSuitable = false;
-      }
+      return rooms === roomsElement.value;
     };
 
     var checkGuests = function () {
       if (guestsElement.value === ANY_VALUE) {
-        return;
+        return true;
       }
 
-      var guests = ANY_VALUE;
+      var guests = getPropertyValue(adv.offer.guests, GuestsValue.MIN, GuestsValue.MAX);
 
-      if (adv.offer.guests >= 0 && adv.offer.guests <= 2) {
-        guests = String(adv.offer.guests);
-      }
-
-      if (guests !== guestsElement.value) {
-        isSuitable = false;
-      }
+      return guests === guestsElement.value;
     };
 
     var checkFeatures = function () {
-      var checkAvailability = function (arr, val) {
-        return arr.some(function (element) {
-          return val === element;
+      var isSuitable = true;
+
+      var checkAvailability = function (array, value) {
+        return array.some(function (element) {
+          return value === element;
         });
       };
 
@@ -89,18 +117,15 @@
           isSuitable = false;
         }
       });
+
+      return isSuitable;
     };
 
-    checkType();
-    checkPrice();
-    checkRooms();
-    checkGuests();
-    checkFeatures();
-
-    return isSuitable;
+    // Если хотя бы одна проверка вернёт false, то объявление не подходит
+    return checkType() && checkPrice() && checkRooms() && checkGuests() && checkFeatures();
   };
 
-  var filterChangeHandler = function () {
+  var renderFilteredPins = function () {
     var advertisements = window.map.getAdvertisementsList();
     var filteredAdvertisements = advertisements.filter(function (adv) {
       return getSuitable(adv);
@@ -109,6 +134,10 @@
     window.form.cleanMap();
     window.map.renderAdvertisementsNearbyList(filteredAdvertisements);
     window.map.renderCard(filteredAdvertisements);
+  };
+
+  var filterChangeHandler = function () {
+    debounce(renderFilteredPins);
   };
 
   var filters = Array.from(selectElements).concat(Array.from(checkboxElements));
