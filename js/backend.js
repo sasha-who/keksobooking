@@ -5,6 +5,11 @@
   var URL_SEND = 'https://js.dump.academy/keksobooking';
   var TIMEOUT = 10000;
 
+  var Method = {
+    GET: 'GET',
+    POST: 'POST'
+  };
+
   var HttpCode = {
     SUCCESS: 200,
     INVALID: 400,
@@ -24,12 +29,12 @@
 
   var errorTemplate = document.querySelector('#error').content.querySelector('.error');
 
-  var setupXHR = function (url, successHandler, errorHandler, cb) {
+  var setupXHR = function (url, method, successHandler, errorHandler, cb) {
     var xhr = new XMLHttpRequest();
 
     xhr.responseType = 'json';
 
-    xhr.open('GET', url);
+    xhr.open(method, url);
 
     xhr.timeout = TIMEOUT;
 
@@ -117,12 +122,12 @@
     },
 
     load: function (successHandler, errorHandler, cb) {
-      var xhr = setupXHR(URL_LOAD, successHandler, errorHandler, cb);
+      var xhr = setupXHR(URL_LOAD, Method.GET, successHandler, errorHandler, cb);
       xhr.send();
     },
 
     send: function (data, successHandler, errorHandler, cb) {
-      var xhr = setupXHR(URL_SEND, successHandler, errorHandler, cb);
+      var xhr = setupXHR(URL_SEND, Method.POST, successHandler, errorHandler, cb);
       xhr.send(data);
     }
   };
