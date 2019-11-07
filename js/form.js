@@ -96,12 +96,12 @@
 
   // Валидация
   var cleanMap = function () {
-    var pinElements = window.elements.mapElement.querySelectorAll('.map__pin');
+    var pinElements = window.elements.mapElement.querySelectorAll('.map__pin:not(.map__pin--main)');
     var cardElement = window.elements.mapElement.querySelector('.map__card');
 
-    for (var i = 1; i < pinElements.length; i++) {
-      pinElements[i].remove();
-    }
+    Array.from(pinElements).forEach(function (item) {
+      item.remove();
+    });
 
     if (cardElement) {
       cardElement.remove();

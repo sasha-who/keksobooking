@@ -103,7 +103,7 @@
   };
 
   var renderCard = function (elements) {
-    var mapPinElements = offersElement.querySelectorAll('.map__pin');
+    var mapPinElements = offersElement.querySelectorAll('.map__pin:not(.map__pin--main)');
 
     var getMapCardElement = function () {
       return window.elements.mapElement.querySelector('.map__card');
@@ -131,17 +131,14 @@
           removeCard();
         }
 
-        // [index - 1] — сдвиг нужен из-за первого элемента в mapPinElements (главная метка)
-        window.elements.mapElement.insertBefore(cards[index - 1], mapFiltersElement);
+        window.elements.mapElement.insertBefore(cards[index], mapFiltersElement);
 
         getMapCardElement().querySelector('.popup__close')
             .addEventListener('click', popupCloseClickHandler);
         document.addEventListener('keydown', popupEscPressHandler);
       };
 
-      if (index > 0) {
-        item.addEventListener('click', pinClickHandler);
-      }
+      item.addEventListener('click', pinClickHandler);
     });
   };
 
@@ -159,14 +156,14 @@
     }
   };
 
-  var activateAll = function () {
+  var activateHandler = function () {
     activateMap();
     window.form.activateForm();
     renderCard(advertisements);
   };
 
   var happenByClick = function (evt) {
-    window.backend.load(successHandler, window.backend.errorHandler, activateAll);
+    window.backend.load(successHandler, window.backend.errorHandler, activateHandler);
     window.move(evt);
   };
 
