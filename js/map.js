@@ -109,7 +109,12 @@
       return window.elements.mapElement.querySelector('.map__card');
     };
 
+    var getActivePin = function () {
+      return window.elements.mapElement.querySelector('.map__pin--active');
+    };
+
     var removeCard = function () {
+      getActivePin().classList.remove('map__pin--active');
       getMapCardElement().remove();
     };
 
@@ -128,10 +133,11 @@
     Array.from(mapPinElements).forEach(function (item, index) {
       var pinClickHandler = function () {
         if (getMapCardElement()) {
-          removeCard();
+          removeCard(item);
         }
 
         window.elements.mapElement.insertBefore(cards[index], mapFiltersElement);
+        item.classList.add('map__pin--active');
 
         getMapCardElement().querySelector('.popup__close')
             .addEventListener('click', popupCloseClickHandler);

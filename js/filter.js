@@ -131,7 +131,7 @@
       return getSuitable(adv);
     });
 
-    window.form.cleanMap();
+    window.form.clearMap();
     window.map.renderAdvertisementsNearbyList(filteredAdvertisements);
     window.map.renderCard(filteredAdvertisements);
   };

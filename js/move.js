@@ -22,8 +22,8 @@
     var mainPinActiveHeight = mainPinHeight + pointerHeight;
 
     var critLocationX = {
-      MIN: 0,
-      max: parseFloat(mapWigth) - mainPinWidth
+      min: 0,
+      max: parseFloat(mapWigth) - mainPinWidth / 2
     };
 
     var startCoords = new Coordinate(evt.clientX, evt.clientY);
@@ -55,8 +55,8 @@
             .style.top = (locationYOption.MAX - mainPinActiveHeight) + 'px';
       }
 
-      if (window.elements.mainPinElement.offsetLeft < critLocationX.MIN) {
-        window.elements.mainPinElement.style.left = critLocationX.MIN;
+      if (window.elements.mainPinElement.offsetLeft < critLocationX.min) {
+        window.elements.mainPinElement.style.left = (critLocationX.min - mainPinWidth / 2) + 'px';
       }
 
       if (window.elements.mainPinElement.offsetLeft > critLocationX.max) {

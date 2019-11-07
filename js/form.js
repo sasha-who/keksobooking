@@ -29,6 +29,7 @@
   var adFormElement = document.querySelector('.ad-form');
   var adFormHeaderElement = adFormElement.querySelector('.ad-form-header');
   var adFormElements = adFormElement.querySelectorAll('.ad-form__element');
+  var resetElement = adFormElement.querySelector('.ad-form__reset');
   var mapFiltersElement = window.elements.mapElement.querySelector('.map__filters');
   var mapFeaturesElements = mapFiltersElement.querySelectorAll('.map__features');
   var mapFiltersElements = mapFiltersElement.querySelectorAll('.map__filter');
@@ -44,23 +45,23 @@
 
   var addMainPinLocation = function (isInactive) {
     var mainPin = {
-      width: parseFloat(getComputedStyle(window.elements.mainPinElement).width),
-      height: parseFloat(getComputedStyle(window.elements.mainPinElement).height),
-      pointerHeight: parseFloat(getComputedStyle(window.elements.mainPinElement, ':after').height),
+      width: parseFloat(getComputedStyle(window.elements.mainPinElement).width, 10),
+      height: parseFloat(getComputedStyle(window.elements.mainPinElement).height, 10),
+      pointerHeight: parseFloat(getComputedStyle(window.elements.mainPinElement, ':after').height, 10),
       getLeft: function () {
-        return parseFloat(window.elements.mainPinElement.style.left);
+        return parseFloat(window.elements.mainPinElement.style.left, 10);
       },
       getTop: function () {
-        return parseFloat(window.elements.mainPinElement.style.top);
+        return parseFloat(window.elements.mainPinElement.style.top, 10);
       }
     };
 
     var getPinLocationX = function () {
-      return mainPin.getLeft() + mainPin.width / 2;
+      return parseInt(mainPin.getLeft() + mainPin.width / 2, 10);
     };
 
     var getPinLocationY = function () {
-      return mainPin.getTop() + mainPin.height;
+      return parseInt(mainPin.getTop() + mainPin.height, 10);
     };
 
     var getPinActivelocationY = function () {
@@ -95,7 +96,7 @@
   deactivateForm();
 
   // Валидация
-  var cleanMap = function () {
+  var clearMap = function () {
     var pinElements = window.elements.mapElement.querySelectorAll('.map__pin:not(.map__pin--main)');
     var cardElement = window.elements.mapElement.querySelector('.map__card');
 
@@ -108,16 +109,20 @@
     }
   };
 
-  var successHandler = function () {
-    // Возвращает в неактивное состояние после отправки данных
-    cleanMap();
+  var returnToInactive = function () {
+    clearMap();
     window.elements.mainPinElement.style.top = pinInitialCoord.TOP;
     window.elements.mainPinElement.style.left = pinInitialCoord.LEFT;
 
     window.elements.mapElement.classList.add('map--faded');
     adFormElement.reset();
     deactivateForm();
+    window.elements.mapfiltersElement.reset();
     window.utils.isRender = false;
+  };
+
+  var successHandler = function () {
+    returnToInactive();
 
     var getSuccessOverlay = function () {
       return window.elements.mainElement.querySelector('.success');
@@ -212,6 +217,19 @@
   setPriceMin();
   syncTimeFields();
 
+  var resetClickHadler = function () {
+    returnToInactive();
+  };
+
+  var resetKeydownHandler = function (evt) {
+    if (evt.key === window.utils.key.ENTER) {
+      returnToInactive();
+    }
+  };
+
+  resetElement.addEventListener('click', resetClickHadler);
+  resetElement.addEventListener('keydown', resetKeydownHandler);
+
   window.form = {
     activateForm: function () {
       adFormElement.classList.remove('ad-form--disabled');
@@ -222,6 +240,6 @@
       addMainPinLocation();
     },
     addMainPinLocation: addMainPinLocation,
-    cleanMap: cleanMap
+    clearMap: clearMap,
   };
 })();
