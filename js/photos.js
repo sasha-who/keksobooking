@@ -3,10 +3,10 @@
 (function () {
   var FILE_TYPES = ['gif', 'jpg', 'jpeg', 'png', 'svg'];
 
-  var avatarChooserField = document.querySelector('.ad-form-header__input');
-  var avatarPreview = document.querySelector('.ad-form-header__preview img');
-  var photoChooserField = document.querySelector('.ad-form__input');
-  var photoContainer = document.querySelector('.ad-form__photo');
+  var avatarChooserElement = document.querySelector('.ad-form-header__input');
+  var avatarPreviewElement = document.querySelector('.ad-form-header__preview img');
+  var photoChooserElement = document.querySelector('.ad-form__input');
+  var photoContainerElement = document.querySelector('.ad-form__photo');
 
   var readFile = function (chooser, preview) {
     var file = chooser.files[0];
@@ -30,15 +30,15 @@
     }
   };
 
-  avatarChooserField.addEventListener('change', function () {
-    readFile(avatarChooserField, avatarPreview);
+  avatarChooserElement.addEventListener('change', function () {
+    readFile(avatarChooserElement, avatarPreviewElement);
   });
 
   var getPhotoElement = function () {
-    return photoContainer.querySelector('img');
+    return photoContainerElement.querySelector('img');
   };
 
-  photoChooserField.addEventListener('change', function () {
+  photoChooserElement.addEventListener('change', function () {
     if (getPhotoElement()) {
       getPhotoElement().remove();
     }
@@ -47,8 +47,8 @@
     photo.width = 70;
     photo.height = 70;
     photo.alt = 'Фотография жилья';
-    photoContainer.appendChild(photo);
+    photoContainerElement.appendChild(photo);
 
-    readFile(photoChooserField, getPhotoElement());
+    readFile(photoChooserElement, getPhotoElement());
   });
 })();

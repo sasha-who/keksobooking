@@ -1,19 +1,19 @@
 'use strict';
 
 (function () {
-  var locationYOptions = {
+  var locationYOption = {
     MIN: 130,
     MAX: 630
   };
 
-  var mapWigth = getComputedStyle(window.utils.mapElement).width;
+  var mapWigth = getComputedStyle(window.elements.mapElement).width;
 
   window.move = function (evt) {
     evt.preventDefault();
 
-    var mainPinWidth = parseFloat(getComputedStyle(window.utils.mainPinElement).width);
-    var mainPinHeight = parseFloat(getComputedStyle(window.utils.mainPinElement).height);
-    var pointerHeight = parseFloat(getComputedStyle(window.utils.mainPinElement, ':after').height);
+    var mainPinWidth = parseFloat(getComputedStyle(window.elements.mainPinElement).width);
+    var mainPinHeight = parseFloat(getComputedStyle(window.elements.mainPinElement).height);
+    var pointerHeight = parseFloat(getComputedStyle(window.elements.mainPinElement, ':after').height);
     var mainPinActiveHeight = mainPinHeight + pointerHeight;
 
     var critLocationX = {
@@ -30,7 +30,7 @@
     var mouseMoveHandler = function (moveEvt) {
       moveEvt.preventDefault();
 
-      var pointTopPosition = window.utils.mainPinElement.offsetTop + mainPinActiveHeight;
+      var pointTopPosition = window.elements.mainPinElement.offsetTop + mainPinActiveHeight;
 
       var shift = {
         x: startCoords.x - moveEvt.clientX,
@@ -42,29 +42,29 @@
         y: moveEvt.clientY
       };
 
-      window.utils.mainPinElement
-          .style.left = (window.utils.mainPinElement.offsetLeft - shift.x) + 'px';
+      window.elements.mainPinElement
+          .style.left = (window.elements.mainPinElement.offsetLeft - shift.x) + 'px';
 
-      window.utils.mainPinElement
-          .style.top = (window.utils.mainPinElement.offsetTop - shift.y) + 'px';
+      window.elements.mainPinElement
+          .style.top = (window.elements.mainPinElement.offsetTop - shift.y) + 'px';
 
       // Выход за границы карты
-      if (pointTopPosition < locationYOptions.MIN) {
-        window.utils.mainPinElement
-            .style.top = (locationYOptions.MIN - mainPinActiveHeight) + 'px';
+      if (pointTopPosition < locationYOption.MIN) {
+        window.elements.mainPinElement
+            .style.top = (locationYOption.MIN - mainPinActiveHeight) + 'px';
       }
 
-      if (pointTopPosition > locationYOptions.MAX) {
-        window.utils.mainPinElement
-            .style.top = (locationYOptions.MAX - mainPinActiveHeight) + 'px';
+      if (pointTopPosition > locationYOption.MAX) {
+        window.elements.mainPinElement
+            .style.top = (locationYOption.MAX - mainPinActiveHeight) + 'px';
       }
 
-      if (window.utils.mainPinElement.offsetLeft < critLocationX.MIN) {
-        window.utils.mainPinElement.style.left = critLocationX.MIN;
+      if (window.elements.mainPinElement.offsetLeft < critLocationX.MIN) {
+        window.elements.mainPinElement.style.left = critLocationX.MIN;
       }
 
-      if (window.utils.mainPinElement.offsetLeft > critLocationX.max) {
-        window.utils.mainPinElement.style.left = critLocationX.max + 'px';
+      if (window.elements.mainPinElement.offsetLeft > critLocationX.max) {
+        window.elements.mainPinElement.style.left = critLocationX.max + 'px';
       }
 
       window.form.addMainPinLocation();
