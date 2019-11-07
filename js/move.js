@@ -6,6 +6,11 @@
     MAX: 630
   };
 
+  var Coordinate = function (x, y) {
+    this.x = x;
+    this.y = y;
+  };
+
   var mapWigth = getComputedStyle(window.elements.mapElement).width;
 
   window.move = function (evt) {
@@ -21,26 +26,17 @@
       max: parseFloat(mapWigth) - mainPinWidth
     };
 
-    // Нужно заменить на  конструктор
-    var startCoords = {
-      x: evt.clientX,
-      y: evt.clientY
-    };
+    var startCoords = new Coordinate(evt.clientX, evt.clientY);
 
     var mouseMoveHandler = function (moveEvt) {
       moveEvt.preventDefault();
 
       var pointTopPosition = window.elements.mainPinElement.offsetTop + mainPinActiveHeight;
 
-      var shift = {
-        x: startCoords.x - moveEvt.clientX,
-        y: startCoords.y - moveEvt.clientY
-      };
+      var shift = new Coordinate(startCoords.x - moveEvt.clientX, startCoords.y - moveEvt.clientY);
 
-      startCoords = {
-        x: moveEvt.clientX,
-        y: moveEvt.clientY
-      };
+      startCoords.x = moveEvt.clientX;
+      startCoords.y = moveEvt.clientY;
 
       window.elements.mainPinElement
           .style.left = (window.elements.mainPinElement.offsetLeft - shift.x) + 'px';
