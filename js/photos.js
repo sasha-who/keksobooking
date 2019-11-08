@@ -59,4 +59,12 @@
     readFile(photoChooserElement, currentPhoto);
     photoCounter++;
   });
+
+  window.photos = function () {
+    Array.from(getPhotoElements()).forEach(function (item) {
+      item.remove();
+    });
+
+    photoCounter = 0;
+  };
 })();

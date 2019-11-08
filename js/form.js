@@ -113,9 +113,9 @@
     clearMap();
     window.elements.mainPinElement.style.top = pinInitialCoord.TOP;
     window.elements.mainPinElement.style.left = pinInitialCoord.LEFT;
-
     window.elements.mapElement.classList.add('map--faded');
     adFormElement.reset();
+    window.photos();
     deactivateForm();
     window.elements.mapfiltersElement.reset();
     window.utils.isRender = false;
