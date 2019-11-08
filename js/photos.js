@@ -1,6 +1,7 @@
 'use strict';
 
 (function () {
+  var ORIGINAL_AVATAR_URL = 'img/muffin-grey.svg';
   var FILE_TYPES = ['gif', 'jpg', 'jpeg', 'png', 'svg'];
 
   var avatarChooserElement = document.querySelector('.ad-form-header__input');
@@ -64,6 +65,7 @@
     Array.from(getPhotoElements()).forEach(function (item) {
       item.remove();
     });
+    avatarPreviewElement.src = ORIGINAL_AVATAR_URL;
 
     photoCounter = 0;
   };
