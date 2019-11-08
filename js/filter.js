@@ -25,12 +25,12 @@
     HIGH: 'high'
   };
 
-  var typeElement = window.utils.mapElement.querySelector('#housing-type');
-  var priceElement = window.utils.mapElement.querySelector('#housing-price');
-  var roomsElement = window.utils.mapElement.querySelector('#housing-rooms');
-  var guestsElement = window.utils.mapElement.querySelector('#housing-guests');
-  var selectElements = window.utils.mapElement.querySelectorAll('.map__filter');
-  var checkboxElements = window.utils.mapElement.querySelectorAll('.map__checkbox');
+  var typeElement = window.elements.mapElement.querySelector('#housing-type');
+  var priceElement = window.elements.mapElement.querySelector('#housing-price');
+  var roomsElement = window.elements.mapElement.querySelector('#housing-rooms');
+  var guestsElement = window.elements.mapElement.querySelector('#housing-guests');
+  var selectElements = window.elements.mapElement.querySelectorAll('.map__filter');
+  var checkboxElements = window.elements.mapElement.querySelectorAll('.map__checkbox');
 
   var lastTimeout;
 
@@ -87,9 +87,9 @@
         return true;
       }
 
-      var rooms = getPropertyValue(adv.offer.rooms, RoomsValue.MIN, RoomsValue.MAX);
+      var roomsValue = getPropertyValue(adv.offer.rooms, RoomsValue.MIN, RoomsValue.MAX);
 
-      return rooms === roomsElement.value;
+      return roomsValue === roomsElement.value;
     };
 
     var checkGuests = function () {
@@ -97,9 +97,9 @@
         return true;
       }
 
-      var guests = getPropertyValue(adv.offer.guests, GuestsValue.MIN, GuestsValue.MAX);
+      var guestsValue = getPropertyValue(adv.offer.guests, GuestsValue.MIN, GuestsValue.MAX);
 
-      return guests === guestsElement.value;
+      return guestsValue === guestsElement.value;
     };
 
     var checkFeatures = function () {
@@ -131,7 +131,7 @@
       return getSuitable(adv);
     });
 
-    window.form.cleanMap();
+    window.form.clearMap();
     window.map.renderAdvertisementsNearbyList(filteredAdvertisements);
     window.map.renderCard(filteredAdvertisements);
   };
