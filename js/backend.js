@@ -4,15 +4,16 @@
   var URL_LOAD = 'https://js.dump.academy/keksobooking/data';
   var URL_SEND = 'https://js.dump.academy/keksobooking';
   var TIMEOUT = 10000;
+  var STATUS_DESCRIPTION = 'Статус ответа: ';
 
-  var Method = {
+  var HttpMethod = {
     GET: 'GET',
     POST: 'POST'
   };
 
   var HttpCode = {
     SUCCESS: 200,
-    INVALID: 400,
+    BAD_REQUEST: 400,
     NOT_AUTHORIZED: 401,
     NOT_FOUND: 404,
     SERVER: 500
@@ -27,7 +28,9 @@
     LONG_ANSWER: 'Слишком долгий ответ сервера'
   };
 
-  var errorTemplate = document.querySelector('#error').content.querySelector('.error');
+  var runIfFunction = function (fn) {
+    return typeof fn === 'function' && fn();
+  };
 
   var setupXHR = function (url, method, successHandler, errorHandler, cb) {
     var xhr = new XMLHttpRequest();
@@ -41,15 +44,17 @@
     xhr.addEventListener('load', function () {
       var error;
 
+      var getRequestStatus = function () {
+        return STATUS_DESCRIPTION + xhr.status + ' ' + xhr.statusText;
+      };
+
       switch (xhr.status) {
         case HttpCode.SUCCESS:
           successHandler(xhr.response);
-          if (cb) {
-            cb();
-          }
+          runIfFunction(cb);
           break;
 
-        case HttpCode.INVALID:
+        case HttpCode.BAD_REQUEST:
           error = Error.INVALID;
           break;
 
@@ -66,7 +71,7 @@
           break;
 
         default:
-          error = 'Статус ответа: ' + xhr.status + ' ' + xhr.statusText;
+          error = getRequestStatus();
       }
 
       if (error) {
@@ -86,48 +91,13 @@
   };
 
   window.backend = {
-    errorHandler: function (errorMessage) {
-      var getErrorOverlay = function () {
-        return window.elements.mainElement.querySelector('.error');
-      };
-
-      if (!getErrorOverlay()) {
-        var errorElement = errorTemplate.cloneNode(true);
-
-        errorElement.querySelector('.error__message').textContent = errorMessage;
-        window.elements.mainElement.appendChild(errorElement);
-
-        var errorOverlayElement = getErrorOverlay();
-        var errorButtonElement = errorOverlayElement.querySelector('.error__button');
-
-        var removeOverlay = function () {
-          errorOverlayElement.remove();
-        };
-
-        var overlayClickHandler = function () {
-          removeOverlay();
-        };
-
-        var overlayKeydownHandler = function (evt) {
-          if (evt.key === window.utils.key.ESCAPE) {
-            removeOverlay();
-            document.removeEventListener('keydown', overlayKeydownHandler);
-          }
-        };
-
-        errorOverlayElement.addEventListener('click', overlayClickHandler);
-        errorButtonElement.addEventListener('click', overlayClickHandler);
-        document.addEventListener('keydown', overlayKeydownHandler);
-      }
-    },
-
     load: function (successHandler, errorHandler, cb) {
-      var xhr = setupXHR(URL_LOAD, Method.GET, successHandler, errorHandler, cb);
+      var xhr = setupXHR(URL_LOAD, HttpMethod.GET, successHandler, errorHandler, cb);
       xhr.send();
     },
 
     send: function (data, successHandler, errorHandler, cb) {
-      var xhr = setupXHR(URL_SEND, Method.POST, successHandler, errorHandler, cb);
+      var xhr = setupXHR(URL_SEND, HttpMethod.POST, successHandler, errorHandler, cb);
       xhr.send(data);
     }
   };

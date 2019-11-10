@@ -4,7 +4,7 @@
   var ERROR_MISMATCH = 'Несоответствие количества комнат и гостей';
   var PRICE_MAX_VALUE = 1000000;
 
-  var CritValue = {
+  var Extreme = {
     ROOM: 100,
     CAPACITY: 0
   };
@@ -21,9 +21,19 @@
     BUNGALO: 0
   };
 
-  var pinInitialCoord = {
+  var PinInitialCoord = {
     TOP: '375px',
     LEFT: '570px'
+  };
+
+  var Attribute = {
+    MIN: 'min',
+    MAX: 'max',
+    PLACEHOLDER: 'placeholder',
+    REQUIRED: 'required',
+    MIN_LENGTH: 'minLength',
+    MAX_LENGTH: 'maxLength',
+    READ_ONLY: 'readOnly'
   };
 
   var adFormElement = document.querySelector('.ad-form');
@@ -68,13 +78,17 @@
       return mainPin.getTop() + mainPin.height + mainPin.pointerHeight;
     };
 
+    var getAddress = function (x, y) {
+      return x + ', ' + y;
+    };
+
     // Флаг для задания координат в неактивном состоянии
     if (isInactive) {
-      formAddressElement.value = getPinLocationX() + ', ' + getPinLocationY();
+      formAddressElement.value = getAddress(getPinLocationX(), getPinLocationY());
       return;
     }
 
-    formAddressElement.value = getPinLocationX() + ', ' + getPinActivelocationY();
+    formAddressElement.value = getAddress(getPinLocationX(), getPinActivelocationY());
   };
 
   var setActiveStatus = function (elements, status) {
@@ -111,8 +125,8 @@
 
   var returnToInactive = function () {
     clearMap();
-    window.elements.mainPinElement.style.top = pinInitialCoord.TOP;
-    window.elements.mainPinElement.style.left = pinInitialCoord.LEFT;
+    window.elements.mainPinElement.style.top = PinInitialCoord.TOP;
+    window.elements.mainPinElement.style.left = PinInitialCoord.LEFT;
     window.elements.mapElement.classList.add('map--faded');
     adFormElement.reset();
     window.photos();
@@ -158,8 +172,8 @@
   adFormElement.addEventListener('submit', function (evt) {
     var roomNumber = parseInt(roomElement.value, 10);
     var capacityNumber = parseInt(capacityElement.value, 10);
-    var roomCrit = (roomNumber === CritValue.ROOM);
-    var capacityCrit = (capacityNumber === CritValue.CAPACITY);
+    var roomCrit = (roomNumber === Extreme.ROOM);
+    var capacityCrit = (capacityNumber === Extreme.CAPACITY);
     var roomsFewer = (roomNumber < capacityNumber);
 
     if (roomsFewer || roomCrit && !capacityCrit || !roomCrit && capacityCrit) {
@@ -168,17 +182,13 @@
       capacityElement.setCustomValidity('');
     }
 
-    window.backend.send(new FormData(adFormElement), successHandler, window.backend.errorHandler);
+    window.backend.send(new FormData(adFormElement), successHandler, window.error.errorHandler);
     evt.preventDefault();
   });
 
   var changeAttribute = function (element, attribute, value) {
-    element.setAttribute(attribute, value);
+    element[attribute] = value;
   };
-
-  // var changeAttribute = function (element, attribute, value) {
-  //   element[attribute] = value;
-  // };
 
   var setPriceMin = function () {
     var getTypeValue = function () {
@@ -186,12 +196,12 @@
     };
 
     var changePriceMin = function () {
-      changeAttribute(priceElement, 'min', getTypeValue());
+      changeAttribute(priceElement, Attribute.MIN, getTypeValue());
     };
 
     var typeChangeHandler = function () {
       changePriceMin();
-      changeAttribute(priceElement, 'placeholder', getTypeValue());
+      changeAttribute(priceElement, Attribute.PLACEHOLDER, getTypeValue());
     };
 
     changePriceMin();
@@ -208,12 +218,12 @@
     });
   };
 
-  changeAttribute(titleElement, 'required', true);
-  changeAttribute(titleElement, 'minlength', TitleLength.MIN);
-  changeAttribute(titleElement, 'maxlength', TitleLength.MAX);
-  changeAttribute(priceElement, 'required', true);
-  changeAttribute(priceElement, 'max', PRICE_MAX_VALUE);
-  changeAttribute(formAddressElement, 'readonly', true);
+  changeAttribute(titleElement, Attribute.REQUIRED, true);
+  changeAttribute(titleElement, Attribute.MIN_LENGTH, TitleLength.MIN);
+  changeAttribute(titleElement, Attribute.MAX_LENGTH, TitleLength.MAX);
+  changeAttribute(priceElement, Attribute.REQUIRED, true);
+  changeAttribute(priceElement, Attribute.MAX, PRICE_MAX_VALUE);
+  changeAttribute(formAddressElement, Attribute.READ_ONLY, true);
   setPriceMin();
   syncTimeFields();
 
