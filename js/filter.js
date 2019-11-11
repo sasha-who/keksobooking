@@ -81,8 +81,8 @@
   var checkFeatures = function (adv) {
     var isSuitable = true;
 
-    var checkAvailability = function (array, value) {
-      return array.some(function (element) {
+    var checkAvailability = function (elements, value) {
+      return elements.some(function (element) {
         return value === element;
       });
     };

@@ -170,6 +170,7 @@
   };
 
   adFormElement.addEventListener('submit', function (evt) {
+    evt.preventDefault();
     var roomNumber = parseInt(roomElement.value, 10);
     var capacityNumber = parseInt(capacityElement.value, 10);
     var roomCrit = (roomNumber === Extreme.ROOM);
@@ -182,8 +183,13 @@
       capacityElement.setCustomValidity('');
     }
 
-    window.backend.send(new FormData(adFormElement), successHandler, window.error.errorHandler);
-    evt.preventDefault();
+    capacityElement.addEventListener('change', function () {
+      capacityElement.setCustomValidity('');
+    });
+
+    if (adFormElement.reportValidity()) {
+      window.backend.send(new FormData(adFormElement), successHandler, window.backend.errorHandler);
+    }
   });
 
   var changeAttribute = function (element, attribute, value) {
