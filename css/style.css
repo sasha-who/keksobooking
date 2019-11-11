@@ -573,7 +573,7 @@ fieldset {
 }
 
 .ad-form-header__drop-zone:focus,
-.ad-form-header__input:focus + .form-header__drop-zone {
+.ad-form-header__input:focus + .ad-form-header__drop-zone {
   color: #ff5635;
   -webkit-box-shadow: 0 0 2px 2px #ff6547;
           box-shadow: 0 0 2px 2px #ff6547;

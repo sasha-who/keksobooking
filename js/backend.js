@@ -28,8 +28,8 @@
     LONG_ANSWER: 'Слишком долгий ответ сервера'
   };
 
-  var runIfFunction = function (fn) {
-    return typeof fn === 'function' && fn();
+  var runIfFunction = function (func) {
+    return typeof func === 'function' && func();
   };
 
   var setupXHR = function (url, method, successHandler, errorHandler, cb) {

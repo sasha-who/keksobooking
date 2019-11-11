@@ -41,7 +41,7 @@
   var adFormElements = adFormElement.querySelectorAll('.ad-form__element');
   var resetElement = adFormElement.querySelector('.ad-form__reset');
   var mapFiltersElement = window.elements.mapElement.querySelector('.map__filters');
-  var mapFeaturesElements = mapFiltersElement.querySelectorAll('.map__features');
+  var mapFeaturesElement = mapFiltersElement.querySelector('.map__features');
   var mapFiltersElements = mapFiltersElement.querySelectorAll('.map__filter');
   var capacityElement = adFormElement.querySelector('#capacity');
   var roomElement = adFormElement.querySelector('#room_number');
@@ -55,14 +55,14 @@
 
   var addMainPinLocation = function (isInactive) {
     var mainPin = {
-      width: parseFloat(getComputedStyle(window.elements.mainPinElement).width, 10),
-      height: parseFloat(getComputedStyle(window.elements.mainPinElement).height, 10),
-      pointerHeight: parseFloat(getComputedStyle(window.elements.mainPinElement, ':after').height, 10),
+      width: parseFloat(getComputedStyle(window.elements.mainPinElement).width),
+      height: parseFloat(getComputedStyle(window.elements.mainPinElement).height),
+      pointerHeight: parseFloat(getComputedStyle(window.elements.mainPinElement, ':after').height),
       getLeft: function () {
-        return parseFloat(window.elements.mainPinElement.style.left, 10);
+        return parseFloat(window.elements.mainPinElement.style.left);
       },
       getTop: function () {
-        return parseFloat(window.elements.mainPinElement.style.top, 10);
+        return parseFloat(window.elements.mainPinElement.style.top);
       }
     };
 
@@ -102,7 +102,7 @@
     adFormElement.classList.add('ad-form--disabled');
     adFormHeaderElement.disabled = true;
     setActiveStatus(adFormElements, true);
-    mapFeaturesElements.disabled = true;
+    mapFeaturesElement.disabled = true;
     setActiveStatus(mapFiltersElements, true);
     addMainPinLocation(true);
   };
@@ -142,6 +142,10 @@
       return window.elements.mainElement.querySelector('.success');
     };
 
+    var getSuccessMessage = function () {
+      return window.elements.mainElement.querySelector('.success__message');
+    };
+
     if (!getSuccessOverlay()) {
       var successElement = successTemplate.cloneNode(true);
 
@@ -153,8 +157,10 @@
         successOverlay.remove();
       };
 
-      var overlayClickHandler = function () {
-        removeOverlay();
+      var overlayClickHandler = function (evt) {
+        if (evt.target !== getSuccessMessage()) {
+          removeOverlay();
+        }
       };
 
       var overlayKeydownHandler = function (evt) {
@@ -188,7 +194,7 @@
     });
 
     if (adFormElement.reportValidity()) {
-      window.backend.send(new FormData(adFormElement), successHandler, window.backend.errorHandler);
+      window.backend.send(new FormData(adFormElement), successHandler, window.error);
     }
   });
 
@@ -251,7 +257,7 @@
       adFormElement.classList.remove('ad-form--disabled');
       adFormHeaderElement.disabled = false;
       setActiveStatus(adFormElements, false);
-      mapFeaturesElements.disabled = false;
+      mapFeaturesElement.disabled = false;
       setActiveStatus(mapFiltersElements, false);
       addMainPinLocation();
     },

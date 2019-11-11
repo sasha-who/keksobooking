@@ -43,13 +43,13 @@
     return filter.value === ANY_VALUE || value === filter.value;
   };
 
-  var checkType = function (adv) {
-    return compareValue(typeElement, adv.offer.type);
+  var checkType = function (item) {
+    return compareValue(typeElement, item.offer.type);
   };
 
-  var checkPrice = function (adv) {
+  var checkPrice = function (item) {
     var getPriceRange = function () {
-      var price = adv.offer.price;
+      var price = item.offer.price;
 
       switch (true) {
         case price < Price.LOW:
@@ -66,19 +66,19 @@
     return compareValue(priceElement, getPriceRange());
   };
 
-  var checkRooms = function (adv) {
-    var roomsValue = getPropertyValue(adv.offer.rooms, Room.MIN, Room.MAX);
+  var checkRooms = function (item) {
+    var roomsValue = getPropertyValue(item.offer.rooms, Room.MIN, Room.MAX);
 
     return compareValue(roomsElement, roomsValue);
   };
 
-  var checkGuests = function (adv) {
-    var guestsValue = getPropertyValue(adv.offer.guests, Guest.MIN, Guest.MAX);
+  var checkGuests = function (item) {
+    var guestsValue = getPropertyValue(item.offer.guests, Guest.MIN, Guest.MAX);
 
     return compareValue(guestsElement, guestsValue);
   };
 
-  var checkFeatures = function (adv) {
+  var checkFeatures = function (item) {
     var isSuitable = true;
 
     var checkAvailability = function (elements, value) {
@@ -88,7 +88,7 @@
     };
 
     Array.from(checkboxElements).forEach(function (checkboxElement) {
-      var isAvailable = checkAvailability(adv.offer.features, checkboxElement.value);
+      var isAvailable = checkAvailability(item.offer.features, checkboxElement.value);
       if (checkboxElement.checked && !isAvailable) {
         isSuitable = false;
       }
@@ -100,8 +100,8 @@
   var renderFilteredPins = function () {
     var advertisements = window.map.getAdvertisementsList();
 
-    var filterAdvertisements = function (adv) {
-      return checkType(adv) && checkPrice(adv) && checkRooms(adv) && checkGuests(adv) && checkFeatures(adv);
+    var filterAdvertisements = function (item) {
+      return checkType(item) && checkPrice(item) && checkRooms(item) && checkGuests(item) && checkFeatures(item);
     };
 
     var filteredAdvertisements = window.map.getFinalCount(advertisements.filter(filterAdvertisements));

@@ -3,9 +3,13 @@
 (function () {
   var errorTemplate = document.querySelector('#error').content.querySelector('.error');
 
-  window.error.errorHandler = function (errorMessage) {
+  window.error = function (errorMessage) {
     var getErrorOverlay = function () {
       return window.elements.mainElement.querySelector('.error');
+    };
+
+    var getErrorMessage = function () {
+      return window.elements.mainElement.querySelector('.error__message');
     };
 
     if (!getErrorOverlay()) {
@@ -17,8 +21,10 @@
       var errorOverlayElement = getErrorOverlay();
       var errorButtonElement = errorOverlayElement.querySelector('.error__button');
 
-      var overlayClickHandler = function () {
-        errorOverlayElement.remove();
+      var overlayClickHandler = function (evt) {
+        if (evt.target !== getErrorMessage()) {
+          errorOverlayElement.remove();
+        }
       };
 
       var overlayKeydownHandler = function (evt) {

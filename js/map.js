@@ -120,6 +120,7 @@
     var popupEscPressHandler = function (evt) {
       if (evt.key === window.utils.key.ESCAPE) {
         removeCard();
+        document.removeEventListener('keydown', popupEscPressHandler);
       }
     };
 
@@ -177,7 +178,7 @@
   };
 
   var happenByClick = function (evt) {
-    window.backend.load(successHandler, window.error.errorHandler, activateHandler);
+    window.backend.load(successHandler, window.error, activateHandler);
     window.move(evt);
   };
 
