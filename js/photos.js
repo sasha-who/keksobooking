@@ -42,9 +42,7 @@
   };
 
   var readFile = function (chooser, cb) {
-    for (var i = 0; i < chooser.files.length; i++) {
-      var file = chooser.files[i];
-
+    Array.from(chooser.files).forEach(function (file) {
       if (file) {
         var fileName = file.name.toLowerCase();
 
@@ -64,7 +62,7 @@
           reader.readAsDataURL(file);
         }
       }
-    }
+    });
   };
 
   avatarChooserElement.addEventListener('change', function () {
