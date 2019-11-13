@@ -28,10 +28,6 @@
     LONG_ANSWER: 'Слишком долгий ответ сервера'
   };
 
-  var runIfFunction = function (func) {
-    return typeof func === 'function' && func();
-  };
-
   var setupXHR = function (url, method, successHandler, errorHandler, cb) {
     var xhr = new XMLHttpRequest();
 
@@ -51,7 +47,9 @@
       switch (xhr.status) {
         case HttpCode.SUCCESS:
           successHandler(xhr.response);
-          runIfFunction(cb);
+          if (cb) {
+            cb();
+          }
           break;
 
         case HttpCode.BAD_REQUEST:
