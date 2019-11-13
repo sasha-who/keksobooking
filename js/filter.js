@@ -107,6 +107,7 @@
     var filteredAdvertisements = window.map.getFinalCount(advertisements.filter(filterAdvertisements));
 
     window.form.clearMap();
+    window.form.removeCard();
     window.map.renderAdvertisementsNearbyList(filteredAdvertisements);
     window.map.renderCard(filteredAdvertisements);
   };

@@ -110,21 +110,30 @@
   deactivateForm();
 
   // Валидация
-  var clearMap = function () {
-    var pinElements = window.elements.mapElement.querySelectorAll('.map__pin:not(.map__pin--main)');
+  var removeCard = function () {
     var cardElement = window.elements.mapElement.querySelector('.map__card');
-
-    Array.from(pinElements).forEach(function (item) {
-      item.remove();
-    });
+    var mapPinActive = window.elements.mapElement.querySelector('.map__pin--active');
 
     if (cardElement) {
       cardElement.remove();
     }
+
+    if (mapPinActive) {
+      mapPinActive.classList.remove('map__pin--active');
+    }
+  };
+
+  var clearMap = function () {
+    var pinElements = window.elements.mapElement.querySelectorAll('.map__pin:not(.map__pin--main)');
+
+    Array.from(pinElements).forEach(function (item) {
+      item.remove();
+    });
   };
 
   var returnToInactive = function () {
     clearMap();
+    removeCard();
     window.elements.mainPinElement.style.top = PinInitialCoord.TOP;
     window.elements.mainPinElement.style.left = PinInitialCoord.LEFT;
     window.elements.mapElement.classList.add('map--faded');
@@ -263,5 +272,6 @@
     },
     addMainPinLocation: addMainPinLocation,
     clearMap: clearMap,
+    removeCard: removeCard
   };
 })();

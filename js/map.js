@@ -108,33 +108,22 @@
       return window.elements.mapElement.querySelector('.map__card');
     };
 
-    var getActivePin = function () {
-      return window.elements.mapElement.querySelector('.map__pin--active');
-    };
-
-    var removeCard = function () {
-      getActivePin().classList.remove('map__pin--active');
-      getMapCardElement().remove();
-    };
-
     var popupEscPressHandler = function (evt) {
       if (evt.key === window.utils.key.ESCAPE) {
-        removeCard();
+        window.form.removeCard();
         document.removeEventListener('keydown', popupEscPressHandler);
       }
     };
 
     var popupCloseClickHandler = function () {
-      removeCard();
+      window.form.removeCard();
     };
 
     var cards = generateCards(elements);
 
     Array.from(mapPinElements).forEach(function (item, index) {
       var pinClickHandler = function () {
-        if (getMapCardElement()) {
-          removeCard(item);
-        }
+        window.form.removeCard();
 
         window.elements.mapElement.insertBefore(cards[index], mapFiltersElement);
         item.classList.add('map__pin--active');
