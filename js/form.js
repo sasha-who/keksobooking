@@ -138,7 +138,7 @@
     window.elements.mainPinElement.style.left = PinInitialCoord.LEFT;
     window.elements.mapElement.classList.add('map--faded');
     adFormElement.reset();
-    window.photos();
+    window.photos.reset();
     deactivateForm();
     window.elements.mapfiltersElement.reset();
     window.utils.isRender = false;
@@ -179,6 +179,8 @@
 
   adFormElement.addEventListener('submit', function (evt) {
     evt.preventDefault();
+
+    var data = new FormData(adFormElement);
     var roomNumber = parseInt(roomElement.value, 10);
     var capacityNumber = parseInt(capacityElement.value, 10);
     var roomCrit = (roomNumber === Extreme.ROOM);
@@ -195,8 +197,12 @@
       capacityElement.setCustomValidity('');
     });
 
+    for (var i = 0; i < window.photos.fileListFinal.length - 1; i++) {
+      data.append('images[]', window.photos.fileListFinal[i]);
+    }
+
     if (adFormElement.reportValidity()) {
-      window.backend.send(new FormData(adFormElement), successHandler, window.error);
+      window.backend.send(data, successHandler, window.error);
     }
   });
 

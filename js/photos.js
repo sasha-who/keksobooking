@@ -65,6 +65,19 @@
     });
   };
 
+  var fileList = [];
+  var fileListFinal = [];
+
+  var saveElements = function () {
+    fileList = [];
+    var photos = photoChooserElement.files;
+
+    Array.from(photos).forEach(function (item) {
+      fileList.push(item);
+      fileListFinal.push(item);
+    });
+  };
+
   avatarChooserElement.addEventListener('change', function () {
     readFile(avatarChooserElement, createAvatar);
   });
@@ -72,11 +85,16 @@
   photoChooserElement.addEventListener('change', function () {
     // removePhotos();
     readFile(photoChooserElement, createPhotoPreviews);
+    saveElements();
   });
 
-  window.photos = function () {
-    removePhotos();
-    avatarElement.src = ORIGINAL_AVATAR_URL;
-    photoContainerElement.appendChild(photoElement.cloneNode());
+  window.photos = {
+    reset: function () {
+      removePhotos();
+      avatarElement.src = ORIGINAL_AVATAR_URL;
+      photoContainerElement.appendChild(photoElement.cloneNode());
+    },
+
+    fileListFinal: fileListFinal
   };
 })();
