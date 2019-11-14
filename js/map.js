@@ -146,11 +146,6 @@
     return elements.slice(0, ADVERTISEMENTS_COUNT);
   };
 
-  var successHandler = function (elements) {
-    advertisements = elements.slice().filter(checkAdvertisements);
-    filteredAdvertisements = getFinalCount(advertisements);
-  };
-
   var activateMap = function () {
     window.elements.mapElement.classList.remove('map--faded');
 
@@ -160,14 +155,16 @@
     }
   };
 
-  var activateHandler = function () {
+  var successHandler = function (elements) {
+    advertisements = elements.slice().filter(checkAdvertisements);
+    filteredAdvertisements = getFinalCount(advertisements);
     activateMap();
     window.form.activateForm();
     renderCard(filteredAdvertisements);
   };
 
   var happenByClick = function (evt) {
-    window.backend.load(successHandler, window.error, activateHandler);
+    window.backend.load(successHandler, window.error);
     window.move(evt);
   };
 

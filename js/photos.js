@@ -70,7 +70,7 @@
   });
 
   photoChooserElement.addEventListener('change', function () {
-    removePhotos();
+    // removePhotos();
     readFile(photoChooserElement, createPhotoPreviews);
   });
 

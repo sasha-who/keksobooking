@@ -28,7 +28,7 @@
     LONG_ANSWER: 'Слишком долгий ответ сервера'
   };
 
-  var setupXHR = function (url, method, successHandler, errorHandler, cb) {
+  var setupXHR = function (url, method, successHandler, errorHandler) {
     var xhr = new XMLHttpRequest();
 
     xhr.responseType = 'json';
@@ -47,9 +47,6 @@
       switch (xhr.status) {
         case HttpCode.SUCCESS:
           successHandler(xhr.response);
-          if (cb) {
-            cb();
-          }
           break;
 
         case HttpCode.BAD_REQUEST:
@@ -89,13 +86,13 @@
   };
 
   window.backend = {
-    load: function (successHandler, errorHandler, cb) {
-      var xhr = setupXHR(URL_LOAD, HttpMethod.GET, successHandler, errorHandler, cb);
+    load: function (successHandler, errorHandler) {
+      var xhr = setupXHR(URL_LOAD, HttpMethod.GET, successHandler, errorHandler);
       xhr.send();
     },
 
-    send: function (data, successHandler, errorHandler, cb) {
-      var xhr = setupXHR(URL_SEND, HttpMethod.POST, successHandler, errorHandler, cb);
+    send: function (data, successHandler, errorHandler) {
+      var xhr = setupXHR(URL_SEND, HttpMethod.POST, successHandler, errorHandler);
       xhr.send(data);
     }
   };

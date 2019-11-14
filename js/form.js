@@ -53,6 +53,22 @@
   var formAddressElement = adFormElement.querySelector('#address');
   var successTemplate = document.querySelector('#success').content.querySelector('.success');
 
+  var getPinLocationX = function (pin) {
+    return parseInt(pin.getLeft() + pin.width / 2, 10);
+  };
+
+  var getPinLocationY = function (pin) {
+    return parseInt(pin.getTop() + pin.height, 10);
+  };
+
+  var getPinActivelocationY = function (pin) {
+    return pin.getTop() + pin.height + pin.pointerHeight;
+  };
+
+  var getAddress = function (x, y) {
+    return x + ', ' + y;
+  };
+
   var addMainPinLocation = function (isInactive) {
     var mainPin = {
       width: parseFloat(getComputedStyle(window.elements.mainPinElement).width),
@@ -66,29 +82,13 @@
       }
     };
 
-    var getPinLocationX = function () {
-      return parseInt(mainPin.getLeft() + mainPin.width / 2, 10);
-    };
-
-    var getPinLocationY = function () {
-      return parseInt(mainPin.getTop() + mainPin.height, 10);
-    };
-
-    var getPinActivelocationY = function () {
-      return mainPin.getTop() + mainPin.height + mainPin.pointerHeight;
-    };
-
-    var getAddress = function (x, y) {
-      return x + ', ' + y;
-    };
-
     // Флаг для задания координат в неактивном состоянии
     if (isInactive) {
-      formAddressElement.value = getAddress(getPinLocationX(), getPinLocationY());
+      formAddressElement.value = getAddress(getPinLocationX(mainPin), getPinLocationY(mainPin));
       return;
     }
 
-    formAddressElement.value = getAddress(getPinLocationX(), getPinActivelocationY());
+    formAddressElement.value = getAddress(getPinLocationX(mainPin), getPinActivelocationY(mainPin));
   };
 
   var setActiveStatus = function (elements, status) {
@@ -144,42 +144,35 @@
     window.utils.isRender = false;
   };
 
+  var getSuccessOverlay = function () {
+    return window.elements.mainElement.querySelector('.success');
+  };
+
+  var getSuccessMessage = function () {
+    return window.elements.mainElement.querySelector('.success__message');
+  };
+
+  var overlayClickHandler = function (evt) {
+    if (evt.target !== getSuccessMessage()) {
+      getSuccessOverlay().remove();
+    }
+  };
+
+  var overlayKeydownHandler = function (evt) {
+    if (evt.key === window.utils.key.ESCAPE) {
+      getSuccessOverlay().remove();
+      document.removeEventListener('keydown', overlayKeydownHandler);
+    }
+  };
+
   var successHandler = function () {
     returnToInactive();
 
-    var getSuccessOverlay = function () {
-      return window.elements.mainElement.querySelector('.success');
-    };
-
-    var getSuccessMessage = function () {
-      return window.elements.mainElement.querySelector('.success__message');
-    };
-
     if (!getSuccessOverlay()) {
       var successElement = successTemplate.cloneNode(true);
-
       window.elements.mainElement.appendChild(successElement);
 
-      var successOverlay = getSuccessOverlay();
-
-      var removeOverlay = function () {
-        successOverlay.remove();
-      };
-
-      var overlayClickHandler = function (evt) {
-        if (evt.target !== getSuccessMessage()) {
-          removeOverlay();
-        }
-      };
-
-      var overlayKeydownHandler = function (evt) {
-        if (evt.key === window.utils.key.ESCAPE) {
-          removeOverlay();
-          document.removeEventListener('keydown', overlayKeydownHandler);
-        }
-      };
-
-      successOverlay.addEventListener('click', overlayClickHandler);
+      getSuccessOverlay().addEventListener('click', overlayClickHandler);
       document.addEventListener('keydown', overlayKeydownHandler);
     }
   };
@@ -211,20 +204,20 @@
     element[attribute] = value;
   };
 
+  var getTypeValue = function () {
+    return ApartmentTypeMinValue[typeElement.value.toUpperCase()];
+  };
+
+  var changePriceMin = function () {
+    changeAttribute(priceElement, Attribute.MIN, getTypeValue());
+  };
+
+  var typeChangeHandler = function () {
+    changePriceMin();
+    changeAttribute(priceElement, Attribute.PLACEHOLDER, getTypeValue());
+  };
+
   var setPriceMin = function () {
-    var getTypeValue = function () {
-      return ApartmentTypeMinValue[typeElement.value.toUpperCase()];
-    };
-
-    var changePriceMin = function () {
-      changeAttribute(priceElement, Attribute.MIN, getTypeValue());
-    };
-
-    var typeChangeHandler = function () {
-      changePriceMin();
-      changeAttribute(priceElement, Attribute.PLACEHOLDER, getTypeValue());
-    };
-
     changePriceMin();
     typeElement.addEventListener('change', typeChangeHandler);
   };
