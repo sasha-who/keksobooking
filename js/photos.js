@@ -16,8 +16,16 @@
   var photoContainerElement = document.querySelector('.ad-form__photo-container');
   var photoElement = photoContainerElement.querySelector('.ad-form__photo');
 
+  var fileList = [];
+
   var getPhotoElements = function () {
     return document.querySelectorAll('.ad-form__photo');
+  };
+
+  var removePhotos = function () {
+    Array.from(getPhotoElements()).forEach(function (item) {
+      item.remove();
+    });
   };
 
   var createAvatar = function (result) {
@@ -33,12 +41,6 @@
     photo.src = result;
     newPhoto.appendChild(photo);
     photoContainerElement.appendChild(newPhoto);
-  };
-
-  var removePhotos = function () {
-    Array.from(getPhotoElements()).forEach(function (item) {
-      item.remove();
-    });
   };
 
   var readFile = function (chooser, cb) {
@@ -65,16 +67,11 @@
     });
   };
 
-  var fileList = [];
-  var fileListFinal = [];
-
-  var saveElements = function () {
-    fileList = [];
+  var savePhotos = function () {
     var photos = photoChooserElement.files;
 
     Array.from(photos).forEach(function (item) {
       fileList.push(item);
-      fileListFinal.push(item);
     });
   };
 
@@ -83,18 +80,18 @@
   });
 
   photoChooserElement.addEventListener('change', function () {
-    // removePhotos();
+    photoElement.remove();
     readFile(photoChooserElement, createPhotoPreviews);
-    saveElements();
+    savePhotos();
   });
 
   window.photos = {
     reset: function () {
       removePhotos();
-      avatarElement.src = ORIGINAL_AVATAR_URL;
       photoContainerElement.appendChild(photoElement.cloneNode());
+      avatarElement.src = ORIGINAL_AVATAR_URL;
     },
 
-    fileListFinal: fileListFinal
+    fileList: fileList
   };
 })();

@@ -51,6 +51,7 @@
   var timeinElement = adFormElement.querySelector('#timein');
   var timeoutElement = adFormElement.querySelector('#timeout');
   var formAddressElement = adFormElement.querySelector('#address');
+  var errorTemplate = document.querySelector('#error').content.querySelector('.error');
   var successTemplate = document.querySelector('#success').content.querySelector('.success');
 
   var getPinLocationX = function (pin) {
@@ -144,37 +145,52 @@
     window.utils.isRender = false;
   };
 
-  var getSuccessOverlay = function () {
-    return window.elements.mainElement.querySelector('.success');
+  var createOverlay = function (template, getMessage) {
+    var overlay = template.cloneNode(true);
+    window.elements.mainElement.appendChild(overlay);
+
+    var overlayClickHandler = function (evt) {
+      if (evt.target !== getMessage()) {
+        overlay.remove();
+      }
+    };
+
+    var overlayKeydownHandler = function (evt) {
+      if (evt.key === window.utils.key.ESCAPE) {
+        overlay.remove();
+        document.removeEventListener('keydown', overlayKeydownHandler);
+      }
+    };
+
+    overlay.addEventListener('click', overlayClickHandler);
+    document.addEventListener('keydown', overlayKeydownHandler);
+
+    return overlay;
+  };
+
+  var getErrorMessage = function () {
+    return document.querySelector('.error__message');
+  };
+
+  var errorHandler = function (message) {
+    if (!document.querySelector('.error')) {
+      var overlay = createOverlay(errorTemplate, getErrorMessage);
+      overlay.querySelector('.error__message').textContent = message;
+
+      var button = overlay.querySelector('.error__button');
+      button.addEventListener('click', function () {
+        overlay.remove();
+      });
+    }
   };
 
   var getSuccessMessage = function () {
-    return window.elements.mainElement.querySelector('.success__message');
-  };
-
-  var overlayClickHandler = function (evt) {
-    if (evt.target !== getSuccessMessage()) {
-      getSuccessOverlay().remove();
-    }
-  };
-
-  var overlayKeydownHandler = function (evt) {
-    if (evt.key === window.utils.key.ESCAPE) {
-      getSuccessOverlay().remove();
-      document.removeEventListener('keydown', overlayKeydownHandler);
-    }
+    return document.querySelector('.success__message');
   };
 
   var successHandler = function () {
     returnToInactive();
-
-    if (!getSuccessOverlay()) {
-      var successElement = successTemplate.cloneNode(true);
-      window.elements.mainElement.appendChild(successElement);
-
-      getSuccessOverlay().addEventListener('click', overlayClickHandler);
-      document.addEventListener('keydown', overlayKeydownHandler);
-    }
+    createOverlay(successTemplate, getSuccessMessage);
   };
 
   adFormElement.addEventListener('submit', function (evt) {
@@ -197,12 +213,12 @@
       capacityElement.setCustomValidity('');
     });
 
-    for (var i = 0; i < window.photos.fileListFinal.length - 1; i++) {
-      data.append('images[]', window.photos.fileListFinal[i]);
+    for (var i = 0; i < window.photos.fileList.length - 1; i++) {
+      data.append('images[]', window.photos.fileList[i]);
     }
 
     if (adFormElement.reportValidity()) {
-      window.backend.send(data, successHandler, window.error);
+      window.backend.send(data, successHandler, errorHandler);
     }
   });
 
@@ -271,6 +287,7 @@
     },
     addMainPinLocation: addMainPinLocation,
     clearMap: clearMap,
-    removeCard: removeCard
+    removeCard: removeCard,
+    errorHandler: errorHandler
   };
 })();
